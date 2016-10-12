@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-12T09:32:59 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation_solution_affected_assets_subreport" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="1b94591e-417c-4545-b56b-51eade501d59">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="SOLUTION_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[WITH
+   affected_assets AS (
+   	   SELECT DISTINCT asset_id
+   	   FROM dim_asset_vulnerability_finding_rollup_solution
+       WHERE solution_id = $P{SOLUTION_ID}
+   )
+SELECT asset_id, HOST(ip_address) AS ip_address, host_name, sites
+FROM affected_assets avs
+    JOIN dim_asset da USING (asset_id)
+ORDER BY LOWER(host_name), ip_address]]>
+	</queryString>
+	<field name="asset_id" class="java.lang.Long"/>
+	<field name="ip_address" class="java.lang.String"/>
+	<field name="host_name" class="java.lang.String"/>
+	<field name="sites" class="java.lang.String"/>
+	<title>
+		<band height="18">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="517" height="18" backcolor="#FFFFFF" uuid="1a7aecf8-eaf8-4675-9f6c-4bfb3c8f3c20">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Affected Assets"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="18">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="196" height="18" backcolor="#F0F0F0" uuid="35ef6086-3a35-45fe-9e1a-1a628f4f7bd7"/>
+				<box leftPadding="6"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Name"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="196" y="0" width="144" height="18" backcolor="#F0F0F0" uuid="17f95baf-6e0c-4878-b9d5-eaa852a78919"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["IP Address"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="340" y="0" width="176" height="18" backcolor="#F0F0F0" uuid="5612a23e-f4a1-4a7a-aaca-1d3a987ce46d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Site"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Prevent">
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="340" y="0" width="177" height="14" uuid="94684a1d-5392-4334-b64f-8752a6205c91">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sites}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="196" y="0" width="144" height="14" uuid="4c657203-d40a-4f5c-9a91-47837aaaf9fd"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ip_address}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="196" height="14" uuid="5d68b589-36c3-452d-92ce-dfbba6b42013">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="6"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{host_name} == null ? "" : $F{host_name}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="0" y="14" width="517" height="1" forecolor="#E3E3E3" uuid="136524f3-f185-4f83-ac92-570263fccba8"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

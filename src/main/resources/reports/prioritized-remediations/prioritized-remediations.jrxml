@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-12T11:00:16 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation-summary" pageWidth="595" pageHeight="842" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="112"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="REPORT_NAME" class="java.lang.String">
+		<parameterDescription><![CDATA[The name of the report being generated.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="NUMBER_OF_SOLUTIONS" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SORT_BY" class="java.lang.String">
+		<parameterDescription><![CDATA[The field to prioritize by, one of: assets, risk_score, vulnerabilities, malware_kits, or exploits.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_TIMESTAMP" class="java.util.Date" isForPrompting="false">
+		<parameterDescription><![CDATA[The timestamp created at report generation.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_DATE" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[The locale-formatted date string based on the report timestamp.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[DateFormat.getDateInstance(DateFormat.LONG, $P{REPORT_LOCALE}).format($P{REPORT_TIMESTAMP})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_TIME" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[The 24-hour formatted time string with timezone based on the report timestamp.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[$P{REPORT_FORMAT_FACTORY}.createDateFormat("HH:mm:ss z",$P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE}).format($P{REPORT_TIMESTAMP})]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1;]]>
+	</queryString>
+	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="45" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="0" width="523" height="45" uuid="7bb8b660-5bde-4638-bed7-dc0bd29947bd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SORT_BY">
+					<subreportParameterExpression><![CDATA[$P{SORT_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NUMBER_OF_SOLUTIONS">
+					<subreportParameterExpression><![CDATA[$P{NUMBER_OF_SOLUTIONS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TITLE">
+					<subreportParameterExpression><![CDATA[msg("Top {0} Remediations by {1}", $P{NUMBER_OF_SOLUTIONS}, 
+$P{SORT_BY}.equals("risk_score") ? "Risk" : $P{SORT_BY}.equals("assets") ? "Affected Assets" : $P{SORT_BY}.equals("vulnerabilities") ? "Vulnerabilities" : $P{SORT_BY}.equals("exploits") ? "Exploit Exposures" : $P{SORT_BY}.equals("malware_kits") ? "Malware Exposures" : "")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/title.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="229">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="130" width="522" height="99" uuid="63572b53-c4cf-4762-97dd-a95bb71a8049"/>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SORT_BY">
+					<subreportParameterExpression><![CDATA[$P{SORT_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NUMBER_OF_SOLUTIONS">
+					<subreportParameterExpression><![CDATA[$P{NUMBER_OF_SOLUTIONS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/remediation/remediation-listing.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="0" width="522" height="129" uuid="ea056a2f-0a9f-4381-b1e2-b70917bcfc53"/>
+				<subreportParameter name="NUMBER_OF_SOLUTIONS">
+					<subreportParameterExpression><![CDATA[$P{NUMBER_OF_SOLUTIONS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REPORT_TEMPLATES">
+					<subreportParameterExpression><![CDATA[$P{REPORT_TEMPLATES}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SORT_BY">
+					<subreportParameterExpression><![CDATA[$P{SORT_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/remediation/remediation-impact-header.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Prevent">
+			<textField evaluationTime="Auto">
+				<reportElement x="469" y="0" width="53" height="20" forecolor="#333333" uuid="85122008-fdcc-4d29-982f-4adefb7072be"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[msg("{0} of {1}", $V{CURRENT_PAGE_NUMBER}, $V{PAGE_NUMBER})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

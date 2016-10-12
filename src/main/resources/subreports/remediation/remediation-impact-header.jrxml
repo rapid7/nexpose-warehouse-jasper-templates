@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-12T10:11:59 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation-summary_subreport" pageWidth="523" pageHeight="802" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="da005149-8b88-49f7-a51c-11ffe3122929">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="NUMBER_OF_SOLUTIONS" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SORT_BY" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH
+   selected_remediations AS (
+      SELECT fr.solution_id, htmlToText(ds.summary) AS solution_summary, fr.assets AS assets, 
+         fr.vulnerabilities AS vulnerabilities, fr.risk_score AS risk_score, fr.exploits AS exploits, 
+         fr.malware_kits AS malware_kits
+      FROM fact_remediation fr
+         JOIN dim_solution ds USING (solution_id)
+      ORDER BY $P!{SORT_BY} DESC
+      LIMIT $P!{NUMBER_OF_SOLUTIONS}
+   )
+SELECT (SELECT COUNT(DISTINCT solution_id) FROM selected_remediations) AS result_solutions,
+   COALESCE(SUM(assets), 0) AS result_asset_count, COALESCE(SUM(vulnerabilities), 0) AS result_vulnerabilities, 
+   COALESCE(SUM(malware_kits), 0) AS result_malware_kits, COALESCE(SUM(exploits), 0) AS result_exploits, 
+   (SELECT vulnerabilities FROM fact_all) AS start_vulnerabilities, (SELECT malware_kits FROM fact_all) AS start_malware_kits, (SELECT exploits FROM fact_all) AS start_exploits
+FROM selected_remediations]]>
+	</queryString>
+	<field name="result_solutions" class="java.lang.Long"/>
+	<field name="result_asset_count" class="java.lang.Long"/>
+	<field name="result_vulnerabilities" class="java.lang.Long"/>
+	<field name="result_malware_kits" class="java.lang.Long"/>
+	<field name="result_exploits" class="java.lang.Long"/>
+	<field name="start_vulnerabilities" class="java.lang.Long"/>
+	<field name="start_malware_kits" class="java.lang.Integer"/>
+	<field name="start_exploits" class="java.lang.Integer"/>
+	<title>
+		<band height="125" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="1" width="120" height="123" forecolor="#000000" backcolor="#0099CB" uuid="585fd69a-8582-49d5-ab71-20517329925a"/>
+				<textField evaluationTime="Report">
+					<reportElement mode="Transparent" x="1" y="21" width="119" height="20" forecolor="#FFFFFF" uuid="deb0f9e9-6349-42a1-be83-c4e308d42199"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Applying"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement x="1" y="48" width="119" height="20" forecolor="#FFFFFF" uuid="45723adf-1b91-4f06-9b23-a06b3ea517b8">
+						<property name="net.sf.jasperreports.export.html.id" value="applyingremediations"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{result_solutions}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="72" width="119" height="20" forecolor="#A1D9EC" uuid="4c24b559-9614-4459-bb8b-be56870873c4"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Top Remediations"]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="124" y="1" width="275" height="89" backcolor="#EC561B" uuid="d259dcca-4cec-4734-9546-235f649497a8"/>
+				<textField evaluationTime="Report">
+					<reportElement x="0" y="0" width="273" height="20" forecolor="#FFFFFF" uuid="9ce60a7f-b114-45c6-9676-f0eed0bc05db"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Will Remediate"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report" pattern="">
+					<reportElement x="36" y="20" width="200" height="28" forecolor="#FFFFFF" uuid="2cf0a52c-66b0-4f9c-995e-2eecddfbff13">
+						<property name="net.sf.jasperreports.export.html.id" value="resolvevulnerabilities"/>
+						<printWhenExpression><![CDATA[(Math.round((new Long($F{result_vulnerabilities}).floatValue() / new Long($F{start_vulnerabilities}).floatValue()) * 100) >= 1) ? Boolean.TRUE : Boolean.FALSE]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="22" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[Math.round(($F{result_vulnerabilities}.floatValue() / $F{start_vulnerabilities}.floatValue()) * 100) + "%"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report">
+					<reportElement x="36" y="48" width="200" height="20" forecolor="#F4BFAB" uuid="e5c368a0-6aa9-41cd-bf30-c9e7d56217d9"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Vulnerabilities"]]></textFieldExpression>
+				</textField>
+				<image>
+					<reportElement x="15" y="31" width="19" height="21" uuid="e132aaa7-8a1a-455f-9482-8d905c98dfe1"/>
+					<imageExpression><![CDATA[$P{BASE_DIR} + "/images/arrow.png"]]></imageExpression>
+				</image>
+				<image>
+					<reportElement x="240" y="31" width="19" height="21" uuid="b5a7f27e-4ed4-4fa9-9d0a-202db30495de"/>
+					<imageExpression><![CDATA[$P{BASE_DIR} + "/images/arrow.png"]]></imageExpression>
+				</image>
+				<textField>
+					<reportElement x="5" y="68" width="268" height="17" forecolor="#FFFFFF" uuid="97654962-588a-4c9c-84e3-83ca93a3def1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA["including:"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report" pattern="#,##0.00 %">
+					<reportElement x="36" y="20" width="200" height="28" forecolor="#FFFFFF" uuid="2cf0a52c-66b0-4f9c-995e-2eecddfbff13">
+						<property name="net.sf.jasperreports.export.html.id" value="resolvevulnerabilities"/>
+						<printWhenExpression><![CDATA[(Math.round((new Long($F{result_vulnerabilities}).floatValue() / new Long($F{start_vulnerabilities}).floatValue()) * 100) >= 1) ? Boolean.FALSE : Boolean.TRUE]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="22" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[(new Long($F{result_vulnerabilities}).floatValue() / new Long($F{start_vulnerabilities}).floatValue())]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="403" y="1" width="120" height="123" backcolor="#91C028" uuid="aefad0d8-6f21-440c-8ed9-be39b7ba7d1c"/>
+				<textField evaluationTime="Report">
+					<reportElement x="0" y="21" width="116" height="20" forecolor="#FFFFFF" uuid="65effaad-fb27-4aeb-bc00-f63515ffc2f3"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Affecting"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report">
+					<reportElement x="0" y="48" width="120" height="20" forecolor="#FFFFFF" uuid="c72b3d91-2be3-4440-87e6-42b400f84ae7">
+						<property name="net.sf.jasperreports.export.html.id" value="affectingassets"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[NumberFormat.getIntegerInstance($P{REPORT_LOCALE}).format($F{result_asset_count})]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report">
+					<reportElement mode="Transparent" x="0" y="72" width="116" height="20" forecolor="#D4E7AC" uuid="ab8f3e14-9232-4744-8a88-de90ca3faee5"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Assets"]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="124" y="90" width="275" height="34" forecolor="#000000" backcolor="#FD6D42" uuid="6c16aed8-17c6-4048-af22-c311d590c122"/>
+				<textField pattern="###" isBlankWhenNull="false">
+					<reportElement mode="Opaque" x="20" y="1" width="38" height="28" forecolor="#FFFFFF" backcolor="#FD6D42" uuid="415cd443-255e-4777-9834-6e4ebe25dc64">
+						<property name="net.sf.jasperreports.export.html.id" value="resolveexploits"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[Math.round(($F{start_exploits}.floatValue() == 0) ? $F{result_exploits}.floatValue() : ($F{result_exploits}.floatValue() / $F{start_exploits}.floatValue()) * 100) + "%"]]></textFieldExpression>
+				</textField>
+				<textField pattern="###">
+					<reportElement mode="Opaque" x="150" y="1" width="45" height="28" forecolor="#FFFFFF" backcolor="#FD6D42" uuid="415cd443-255e-4777-9834-6e4ebe25dc64">
+						<property name="net.sf.jasperreports.export.html.id" value="resolvemalware"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[Math.round(($F{result_malware_kits}.floatValue() == 0) ? $F{result_malware_kits}.floatValue() : ($F{result_malware_kits}.floatValue() / $F{start_malware_kits}.floatValue()) * 100) + "%"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="58" y="0" width="77" height="30" forecolor="#FFFFFF" backcolor="#FD6D42" uuid="d6b5e3d5-a3c6-4d79-877f-6a507ef927fa">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["published exploits"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report">
+					<reportElement mode="Opaque" x="195" y="1" width="80" height="28" forecolor="#FFFFFF" backcolor="#FD6D42" uuid="968ef8a2-d461-4548-9ecd-b878d9dc3489"/>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["available malware kits"]]></textFieldExpression>
+				</textField>
+				<image vAlign="Middle">
+					<reportElement mode="Opaque" x="5" y="7" width="15" height="15" forecolor="#FFFFFF" backcolor="#FD6D42" uuid="62367f46-34ed-4468-9054-fef59960020a"/>
+					<imageExpression><![CDATA[$P{BASE_DIR} + "/images/metasploit.png"]]></imageExpression>
+				</image>
+				<image vAlign="Middle">
+					<reportElement mode="Opaque" x="135" y="7" width="15" height="15" forecolor="#FFFFFF" backcolor="#FD6D42" uuid="98170bdd-c2cd-4bd4-a37c-d9f9a1ff4b84"/>
+					<imageExpression><![CDATA[$P{BASE_DIR} + "/images/malware_orange.png"]]></imageExpression>
+				</image>
+			</frame>
+		</band>
+	</title>
+</jasperReport>

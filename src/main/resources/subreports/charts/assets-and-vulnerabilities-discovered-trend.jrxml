@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-12T10:19:53 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="assets-and-vulnerabilities-discovered-trend" pageWidth="523" pageHeight="400" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="264a987a-9c3b-46a7-9ab8-56b86d279c0f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="REPORT_NAME" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TREND_START_DATE" class="java.util.Date">
+		<parameterDescription><![CDATA[The start date of the trending for the report.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[org.apache.commons.lang.time.DateUtils.addDays(new Date(), -90)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TREND_END_DATE" class="java.util.Date">
+		<parameterDescription><![CDATA[The end date for the trending of the report.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new Date()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TREND_INTERVAL" class="java.lang.String">
+		<parameterDescription><![CDATA[The interval in data points for the trend.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["7 Days"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SORT_BY" class="java.lang.String">
+		<parameterDescription><![CDATA[The field to prioritize by, one of: assets, risk_score, vulnerabilities, malware_kits, or exploits.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="NUMBER_OF_SOLUTIONS" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH
+   dates AS (
+      SELECT row_number() over () AS row, CAST(generate_series AS date) AS day
+      FROM generate_series(to_date($P{TREND_END_DATE}::TEXT, 'YYYY-MM-DD'), to_date($P{TREND_START_DATE}::TEXT, 'YYYY-MM-DD'), -($P{TREND_INTERVAL}::INTERVAL))
+   ),
+   date_ranges AS (
+      SELECT ((d2.day) + INTERVAL '1 day')::DATE AS start, d1.day AS end
+      FROM dates d1
+         JOIN dates d2 ON d1.row + 1 = d2.row  
+   ),
+   assets_by_date_range AS (
+      SELECT DISTINCT ON (asset_id, dr.end) asset_id, dr.end AS day, fad.vulnerabilities
+      FROM fact_asset_date fad
+         CROSS JOIN date_ranges dr
+      WHERE fad.day <= dr.end AND fad.day >= dr.start
+      ORDER BY asset_id, dr.end, fad.day DESC
+   ),
+   date_series AS (
+      SELECT day, COUNT(DISTINCT asset_id) AS assets, COALESCE(SUM(vulnerabilities), 0)::BIGINT AS vulnerabilities
+      FROM assets_by_date_range
+      GROUP BY day
+   ),
+   end_summary AS (
+      SELECT vulnerabilities AS end_vulnerabilities, assets AS end_assets
+      FROM date_series 
+      ORDER BY day DESC
+      LIMIT 1
+   ),
+   start_summary AS (
+      SELECT vulnerabilities AS start_vulnerabilities, assets AS start_assets
+      FROM date_series 
+      ORDER BY day ASC
+      LIMIT 1
+   )
+SELECT day, COALESCE(assets, 0) AS assets, COALESCE(vulnerabilities, 0) AS vulnerabilities, 
+   COALESCE(start_vulnerabilities, 0) AS start_vulnerabilities, COALESCE(end_vulnerabilities, 0) AS end_vulnerabilities, 
+   COALESCE(start_assets, 0) AS start_assets, COALESCE(end_assets, 0) AS end_assets
+FROM date_series
+   CROSS JOIN end_summary
+   CROSS JOIN start_summary
+   RIGHT OUTER JOIN dates USING (day)
+ORDER BY day ASC]]>
+	</queryString>
+	<field name="day" class="java.sql.Date"/>
+	<field name="assets" class="java.lang.Long"/>
+	<field name="vulnerabilities" class="java.lang.Long"/>
+	<field name="start_vulnerabilities" class="java.lang.Long"/>
+	<field name="end_vulnerabilities" class="java.lang.Long"/>
+	<field name="start_assets" class="java.lang.Long"/>
+	<field name="end_assets" class="java.lang.Long"/>
+	<summary>
+		<band height="348">
+			<multiAxisChart>
+				<chart isShowLegend="false" evaluationTime="Report">
+					<reportElement positionType="Float" x="0" y="23" width="523" height="262" uuid="240a14d2-c307-4f67-967c-45da954a0605"/>
+					<chartTitle position="Top"/>
+					<chartSubtitle/>
+					<chartLegend position="Bottom"/>
+				</chart>
+				<multiAxisPlot>
+					<plot/>
+					<axis>
+						<lineChart>
+							<chart isShowLegend="false">
+								<reportElement x="0" y="0" width="0" height="0" forecolor="#000000" backcolor="#FFFFFF" uuid="3621e407-16b0-46e9-bf11-43b325febaab"/>
+								<chartTitle position="Top" color="#000000"/>
+								<chartSubtitle color="#000000"/>
+								<chartLegend textColor="#000000" backgroundColor="#FFFFFF" position="Bottom"/>
+							</chart>
+							<categoryDataset>
+								<categorySeries>
+									<seriesExpression><![CDATA["Vulnerabilites"]]></seriesExpression>
+									<categoryExpression><![CDATA[$F{day}]]></categoryExpression>
+									<valueExpression><![CDATA[$F{vulnerabilities}]]></valueExpression>
+								</categorySeries>
+							</categoryDataset>
+							<linePlot>
+								<plot labelRotation="-25.0">
+									<seriesColor seriesOrder="0" color="#FF8300"/>
+								</plot>
+								<categoryAxisFormat labelRotation="-25.0">
+									<axisFormat tickLabelColor="#666666" verticalTickLabels="true" axisLineColor="#999999">
+										<labelFont>
+											<font size="8"/>
+										</labelFont>
+										<tickLabelFont>
+											<font size="8"/>
+										</tickLabelFont>
+									</axisFormat>
+								</categoryAxisFormat>
+								<valueAxisLabelExpression><![CDATA["Vulnerabilities"]]></valueAxisLabelExpression>
+								<valueAxisFormat>
+									<axisFormat tickLabelColor="#666666" tickLabelMask="#,###" verticalTickLabels="false" axisLineColor="#999999">
+										<tickLabelFont>
+											<font size="8"/>
+										</tickLabelFont>
+									</axisFormat>
+								</valueAxisFormat>
+							</linePlot>
+						</lineChart>
+					</axis>
+					<axis position="rightOrBottom">
+						<stackedBarChart>
+							<chart isShowLegend="false">
+								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="0" height="0" backcolor="#FFFFFF" uuid="f6c7db72-922f-46fa-8123-f0c1f18bed23"/>
+								<chartTitle position="Top" color="#000000"/>
+								<chartSubtitle color="#000000"/>
+								<chartLegend textColor="#000000" backgroundColor="#FFFFFF" position="Bottom"/>
+							</chart>
+							<categoryDataset>
+								<categorySeries>
+									<seriesExpression><![CDATA["Assets"]]></seriesExpression>
+									<categoryExpression><![CDATA[$F{day}]]></categoryExpression>
+									<valueExpression><![CDATA[$F{assets}]]></valueExpression>
+								</categorySeries>
+							</categoryDataset>
+							<barPlot isShowTickLabels="true" isShowTickMarks="true">
+								<plot labelRotation="-25.0">
+									<seriesColor seriesOrder="0" color="#CBE3F5"/>
+								</plot>
+								<itemLabel/>
+								<categoryAxisFormat labelRotation="-25.0">
+									<axisFormat tickLabelColor="#666666" verticalTickLabels="false" axisLineColor="#999999">
+										<labelFont>
+											<font size="8"/>
+										</labelFont>
+										<tickLabelFont>
+											<font size="6"/>
+										</tickLabelFont>
+									</axisFormat>
+								</categoryAxisFormat>
+								<valueAxisLabelExpression><![CDATA["Affected Assets"]]></valueAxisLabelExpression>
+								<valueAxisFormat>
+									<axisFormat tickLabelColor="#666666" tickLabelMask="#,###" verticalTickLabels="false" axisLineColor="#999999">
+										<tickLabelFont>
+											<font size="8"/>
+										</tickLabelFont>
+									</axisFormat>
+								</valueAxisFormat>
+							</barPlot>
+						</stackedBarChart>
+					</axis>
+				</multiAxisPlot>
+			</multiAxisChart>
+			<textField>
+				<reportElement positionType="Float" x="0" y="0" width="523" height="20" uuid="e4e91dfb-12b1-4cc8-94c2-d79eb63942c1">
+					<property name="net.sf.jasperreports.export.html.id" value="trend_by_assets_subtitle"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Assets and Vulnerabilities Discovered"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="354" y="296" width="140" height="16" uuid="8a36cef5-2303-49c4-9073-b670c9049f42"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Assets"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement positionType="Float" x="340" y="297" width="14" height="14" uuid="8d20cd4b-522b-4ac3-8fb6-38ed503eaf6e"/>
+				<imageExpression><![CDATA[$P{BASE_DIR} + "/images/total-assets.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement positionType="Float" x="120" y="296" width="138" height="16" uuid="e4845448-5733-4aff-bcfd-63058c063a1d"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Vulnerabilities"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement positionType="Float" x="105" y="301" width="15" height="7" uuid="0720d007-be1f-4d76-9dd4-78d454ba63db"/>
+				<imageExpression><![CDATA[$P{BASE_DIR} + "/images/total-vuln.png"]]></imageExpression>
+			</image>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="363" y="312" width="117" height="16" forecolor="#999999" uuid="f6a6a446-4025-42e9-b1b7-33f6dc27ee43">
+					<property name="net.sf.jasperreports.export.html.id" value="total_assets_start"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[msg("(was {0})", $F{start_assets})]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement key="" positionType="Float" x="270" y="312" width="93" height="16" uuid="3f657b1e-a4cd-408a-9c4f-39ae33048263">
+					<property name="net.sf.jasperreports.export.html.id" value="total_assets_end"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{end_assets} != 0 ? NumberFormat.getIntegerInstance($P{REPORT_LOCALE}).format($F{end_assets}) : $R{NA}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="130" y="312" width="117" height="16" forecolor="#999999" uuid="dbdb67d1-a4ee-49f9-8ec8-a5dec3538890">
+					<property name="net.sf.jasperreports.export.html.id" value="total_vulns_start"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[msg("(was {0})", $F{start_vulnerabilities})]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="130" y="328" width="50" height="13" forecolor="#999999" uuid="0ab9a433-7989-40df-a8ae-e2a99057d1cc">
+					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} < $F{start_vulnerabilities}]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["decrease"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="130" y="328" width="51" height="13" forecolor="#999999" uuid="176f466d-0ecd-4a24-bc0e-141d16400b1f">
+					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} >= $F{start_vulnerabilities}]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["increase"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0.0 %">
+				<reportElement positionType="Float" x="83" y="328" width="46" height="13" forecolor="#007F00" uuid="7f2149b3-99d7-457f-89e1-aba2dc40134e">
+					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} <= $F{start_vulnerabilities}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[((float)$F{end_vulnerabilities} - $F{start_vulnerabilities}) / $F{start_vulnerabilities}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement key="" positionType="Float" x="37" y="312" width="93" height="16" uuid="403c3042-05d3-4991-85f6-de06c123ff5e">
+					<property name="net.sf.jasperreports.export.html.id" value="total_vulns_end"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{end_vulnerabilities} != 0 ? NumberFormat.getIntegerInstance($P{REPORT_LOCALE}).format($F{end_vulnerabilities}) : $R{NA}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0.0 %">
+				<reportElement positionType="Float" x="83" y="328" width="46" height="13" forecolor="#FF0000" uuid="f87418da-a2b5-4f5c-a473-45f6eccd7514">
+					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} > $F{start_vulnerabilities}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[((float)$F{end_vulnerabilities} - $F{start_vulnerabilities}) / $F{start_vulnerabilities}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="363" y="329" width="50" height="13" forecolor="#999999" uuid="a24e596e-c1b0-4d74-91ee-144529ff13a7">
+					<printWhenExpression><![CDATA[$F{start_assets} != 0 && $F{end_assets} < $F{start_assets}]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["decrease"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="363" y="329" width="51" height="13" forecolor="#999999" uuid="7d741dd7-9945-4040-8f73-b43890876901">
+					<printWhenExpression><![CDATA[$F{start_assets} != 0 && $F{end_assets} >= $F{start_assets}]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["increase"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0.0 %">
+				<reportElement positionType="Float" x="313" y="329" width="50" height="13" forecolor="#000000" uuid="af7963ac-fc77-4d19-b192-07f7d77f23eb">
+					<printWhenExpression><![CDATA[$F{start_assets} > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[((float)$F{end_assets} - $F{start_assets}) / $F{start_assets}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

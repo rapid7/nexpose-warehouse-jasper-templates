@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-12T10:16:43 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation_solution_summary_subreport" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="240baadb-a810-4c31-8b7d-5749801fe59d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="SOLUTION_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="COUNT" class="java.lang.Integer"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT * 
+FROM dim_solution
+WHERE solution_id = $P{SOLUTION_ID}]]>
+	</queryString>
+	<field name="solution_id" class="java.lang.Integer"/>
+	<field name="nexpose_id" class="java.lang.String"/>
+	<field name="url" class="java.lang.String"/>
+	<field name="fix" class="java.lang.String"/>
+	<field name="summary" class="java.lang.String"/>
+	<field name="additional_data" class="java.lang.String"/>
+	<field name="applies_to" class="java.lang.String"/>
+	<variable name="SOLUTION_ID" class="java.lang.Integer">
+		<variableExpression><![CDATA[$P{SOLUTION_ID}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="77" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" mode="Opaque" x="0" y="1" width="523" height="18" backcolor="#F0F0F0" uuid="b2a3e53e-3436-4e4f-b8f9-5045ed53d9dc">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box leftPadding="6"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COUNT}.toString() + ". " + $F{summary}.trim()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="6" y="41" width="517" height="18" uuid="5ba71f86-d48a-4538-a2b7-6d6ddee74510"/>
+				<textElement markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{applies_to} == null ? "" : ("<b>" + $F{applies_to} + "</b><br/>")) +
+($F{fix} == null ? "" : $F{fix}.replace("<a href=", "<a style=\"color:blue;text-decoration:underline;\" href=").replaceFirst("\n<p>", "").trim()) + "\n" +
+($F{additional_data} == null ? "" : $F{additional_data}.replace("<a href=", "<a style=\"color:blue;text-decoration:underline;\" href=" ).trim()) + "\n" +
+($F{url} == null ? "" :  "<a style=\"color:blue;text-decoration:underline;\" href=" + $F{url} + ">" + $F{url} + "</a>".trim())]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="6" y="21" width="517" height="18" backcolor="#FFFFFF" uuid="94f54c36-d8f2-49da-9a9e-a2dd0c88e041">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Remediation Steps"]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement positionType="Float" x="6" y="61" width="517" height="7" isRemoveLineWhenBlank="true" uuid="1787b18f-093b-4e9a-bfb0-af1799452758"/>
+				<subreportParameter name="REPORT_TEMPLATES">
+					<subreportParameterExpression><![CDATA[$P{REPORT_TEMPLATES}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SOLUTION_ID">
+					<subreportParameterExpression><![CDATA[$P{SOLUTION_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["../subreports/remediation/remediation-prerequisite.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="6" y="71" width="517" height="6" uuid="ebd4d755-9d47-41c9-8cbe-9e492a4b5d6c"/>
+				<subreportParameter name="REPORT_TEMPLATES">
+					<subreportParameterExpression><![CDATA[$P{REPORT_TEMPLATES}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SOLUTION_ID">
+					<subreportParameterExpression><![CDATA[$P{SOLUTION_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["../subreports/remediation/remediation-affected-assets.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+</jasperReport>
