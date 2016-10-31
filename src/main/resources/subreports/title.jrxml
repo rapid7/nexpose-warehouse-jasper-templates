@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-12T10:12:51 -->
+<!-- 2016-10-31T09:22:16 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation-summary" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
@@ -30,30 +30,10 @@
 		<parameterDescription><![CDATA[The name of the report being generated.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
-	<parameter name="NUMBER_OF_SOLUTIONS" class="java.lang.Integer">
-		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
-	</parameter>
-	<parameter name="SORT_BY" class="java.lang.String">
-		<parameterDescription><![CDATA[The field to prioritize by, one of: assets, risk_score, vulnerabilities, malware_kits, or exploits.]]></parameterDescription>
-		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="REPORT_TIMESTAMP" class="java.util.Date" isForPrompting="false">
-		<parameterDescription><![CDATA[The timestamp created at report generation.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
-	</parameter>
-	<parameter name="REPORT_DATE" class="java.lang.String" isForPrompting="false">
-		<parameterDescription><![CDATA[The locale-formatted date string based on the report timestamp.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[DateFormat.getDateInstance(DateFormat.LONG, $P{REPORT_LOCALE}).format($P{REPORT_TIMESTAMP})]]></defaultValueExpression>
-	</parameter>
-	<parameter name="REPORT_TIME" class="java.lang.String" isForPrompting="false">
-		<parameterDescription><![CDATA[The 24-hour formatted time string with timezone based on the report timestamp.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[$P{REPORT_FORMAT_FACTORY}.createDateFormat("HH:mm:ss z",$P{REPORT_LOCALE}, $P{REPORT_TIME_ZONE}).format($P{REPORT_TIMESTAMP})]]></defaultValueExpression>
-	</parameter>
 	<parameter name="TITLE" class="java.lang.String">
 		<parameterDescription><![CDATA[]]></parameterDescription>
 	</parameter>
-	<parameter name="SUB_TITLE" class="java.lang.String" isForPrompting="false">
+	<parameter name="SUB_TITLE" class="java.lang.String">
 		<parameterDescription><![CDATA[]]></parameterDescription>
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
@@ -79,7 +59,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, $P{REPORT_LOCALE}).format(new Date())]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement mode="Transparent" x="0" y="0" width="320" height="20" forecolor="#333333" backcolor="#FFFFFF" uuid="0b3d831b-757e-43a3-8cf5-22bf0a83407c">
 					<property name="net.sf.jasperreports.export.html.id" value="title"/>
 				</reportElement>
@@ -90,7 +70,7 @@
 				<textFieldExpression><![CDATA[$P{TITLE}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement positionType="Float" mode="Transparent" x="0" y="20" width="284" height="18" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" forecolor="#333333" backcolor="#FFFFFF" uuid="0a84ac01-fcef-46ee-895f-23355671e948">
+				<reportElement positionType="Float" mode="Transparent" x="0" y="20" width="284" height="18" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" forecolor="#999999" backcolor="#FFFFFF" uuid="0a84ac01-fcef-46ee-895f-23355671e948">
 					<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
 					<property name="net.sf.jasperreports.text.truncate.suffix" value="..."/>
 					<property name="net.sf.jasperreports.export.html.id" value="reportname"/>
@@ -102,10 +82,10 @@
 				<textFieldExpression><![CDATA[$P{REPORT_NAME}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="40" width="523" height="1" forecolor="#CCCCCC" uuid="03e451a6-4a17-4984-bed5-c33132ef3cd3"/>
+				<reportElement positionType="Float" x="0" y="40" width="523" height="1" forecolor="#CCCCCC" uuid="03e451a6-4a17-4984-bed5-c33132ef3cd3"/>
 			</line>
-			<textField isStretchWithOverflow="true" pattern="MMM dd yyyy">
-				<reportElement positionType="Float" x="284" y="20" width="239" height="20" forecolor="#999999" uuid="0424b95f-6554-4ecb-a5c8-83d908f9687d">
+			<textField pattern="MMM dd yyyy">
+				<reportElement x="284" y="20" width="239" height="20" forecolor="#999999" uuid="0424b95f-6554-4ecb-a5c8-83d908f9687d">
 					<property name="net.sf.jasperreports.export.html.id" value="trend_date"/>
 				</reportElement>
 				<box topPadding="0"/>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-31T15:16:35 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CHANGE-ME" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="112"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="322"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="671"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_NAME" class="java.lang.String">
+		<parameterDescription><![CDATA[The name of the report being generated.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TITLE_PAGE" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to show a title page instead of a title-header.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SCOPE_APPENDIX" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to show the scope appendix after the content of the report.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[Clause that can filter assets (asset_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["false"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_VULNERABILITY" class="java.lang.String">
+		<parameterDescription><![CDATA[Clause that can filter vulnerabilities (vulnerability_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SITE_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of sites to filter.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ASSET_GROUP_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of asset groups to filter.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TAG_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of tags to filter.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1;]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="45">
+			<subreport>
+				<reportElement key="" x="0" y="0" width="523" height="45" uuid="d9386716-5aa8-43bd-b613-32328cc3dc89">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TITLE">
+					<subreportParameterExpression><![CDATA["CHANGE ME"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_SITE">
+					<subreportParameterExpression><![CDATA[$P{SITE_NAMES}.isEmpty() ? "false" : "name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET_GROUP">
+					<subreportParameterExpression><![CDATA[$P{ASSET_GROUP_NAMES}.isEmpty() ? "false" : "name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_TAG">
+					<subreportParameterExpression><![CDATA[$P{TAG_NAMES}.isEmpty() ? "false" : "name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/title" + ($P{TITLE_PAGE} ? "-page" : "") + ".jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="104"/>
+	</detail>
+	<pageFooter>
+		<band height="23">
+			<textField evaluationTime="Auto">
+				<reportElement x="370" y="3" width="153" height="20" uuid="92493412-dec6-4b15-8549-180a6956878d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<printWhenExpression><![CDATA[!$P{TITLE_PAGE} || ($P{TITLE_PAGE} && $V{CURRENT_PAGE_NUMBER} > 1.0)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[msg("{0} of {1}", $V{CURRENT_PAGE_NUMBER}, $V{PAGE_NUMBER})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="30">
+			<break>
+				<reportElement x="0" y="0" width="99" height="1" uuid="316b9e79-d3bc-43cd-83a9-616c937c0c0b">
+					<printWhenExpression><![CDATA[$P{SCOPE_APPENDIX}]]></printWhenExpression>
+				</reportElement>
+			</break>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="1" width="523" height="29" uuid="94f77866-2c81-4b0c-8bc1-83ad35a7fdd5">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[$P{SCOPE_APPENDIX}]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_SITE">
+					<subreportParameterExpression><![CDATA[$P{SITE_NAMES}.isEmpty() ? "false" : "name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET_GROUP">
+					<subreportParameterExpression><![CDATA[$P{ASSET_GROUP_NAMES}.isEmpty() ? "false" : "name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_TAG">
+					<subreportParameterExpression><![CDATA[$P{TAG_NAMES}.isEmpty() ? "false" : "name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/appendices/scope.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

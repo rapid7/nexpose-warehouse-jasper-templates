@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-31T15:24:33 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="most-common-services-listing" pageWidth="144" pageHeight="200" columnWidth="144" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5969dff1-afee-44d4-96f3-3599083d86b7">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[WHERE clause that can filter assets.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LIMIT" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of services to list.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH
+   asset_count AS (
+      SELECT COUNT(DISTINCT asset_id) AS total_assets
+      FROM dim_asset
+      WHERE $P!{WHERE_FILTER_ASSET} 
+   )
+SELECT protocol || '/' || port AS service, COUNT(DISTINCT asset_id) AS assets, (SELECT total_assets FROM asset_count)
+FROM dim_asset_service
+WHERE $P!{WHERE_FILTER_ASSET} 
+GROUP BY port, protocol
+ORDER BY assets DESC
+LIMIT $P!{LIMIT}]]>
+	</queryString>
+	<field name="service" class="java.lang.String"/>
+	<field name="assets" class="java.lang.Long"/>
+	<field name="total_assets" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="18">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="50" height="16" forecolor="#4D4D4F" backcolor="#F0F0F0" uuid="f77da95d-a638-4f27-85be-a6097035f5dc">
+					<property name="net.sf.jasperreports.export.html.id" value="assetheader"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="6"/>
+				<textElement verticalAlignment="Middle" rotation="None" markup="none">
+					<font size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Service"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="50" y="0" width="94" height="16" forecolor="#4D4D4F" backcolor="#F0F0F0" uuid="e1ca9e8f-8c7b-4d0c-9cb4-22989aaa746b">
+					<property name="net.sf.jasperreports.export.html.id" value="assetheader"/>
+				</reportElement>
+				<box leftPadding="6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Assets"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement mode="Opaque" x="120" y="2" width="12" height="12" backcolor="#F0F0F0" uuid="211f3bfe-bab2-4530-a25c-09135d039b2f">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{BASE_DIR} + "/images/sort-down.png"]]></imageExpression>
+			</image>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField pattern="">
+				<reportElement x="0" y="0" width="50" height="12" uuid="7737c8f5-b876-40fb-9310-25dfb4eec2db">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{service}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="50" y="0" width="70" height="12" uuid="a1ac3497-b42e-400a-b8da-7df9a57301db">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{assets}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="120" y="0" width="24" height="12" uuid="5b25cb2b-aecb-4722-b5a8-984e97cce242">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="0" rightPadding="1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("(##.0%)").format($F{assets} / $F{total_assets}.doubleValue())]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

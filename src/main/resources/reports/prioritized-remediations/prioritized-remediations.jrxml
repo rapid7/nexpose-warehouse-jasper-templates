@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-12T11:00:16 -->
+<!-- 2016-10-31T14:11:45 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation-summary" pageWidth="595" pageHeight="842" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
@@ -21,13 +21,21 @@
 		<parameterDescription><![CDATA[The name of the report being generated.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
-	<parameter name="NUMBER_OF_SOLUTIONS" class="java.lang.Integer">
-		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
+	<parameter name="TITLE_PAGE" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to show a title page instead of a title-header.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SORT_BY" class="java.lang.String">
-		<parameterDescription><![CDATA[The field to prioritize by, one of: assets, risk_score, vulnerabilities, malware_kits, or exploits.]]></parameterDescription>
-		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
+	<parameter name="SCOPE_APPENDIX" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to show the scope appendix after the content of the report.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SHOW_SUMMARY_HEADER" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to show the summary header for the selected remediations.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SHOW_REMEDIATION_DETAILS" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to show the details and affected assets for each selected solution.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
 	</parameter>
 	<parameter name="REPORT_TIMESTAMP" class="java.util.Date" isForPrompting="false">
 		<parameterDescription><![CDATA[The timestamp created at report generation.]]></parameterDescription>
@@ -45,6 +53,34 @@
 		<parameterDescription><![CDATA[]]></parameterDescription>
 		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
 	</parameter>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[Clause that can filter assets (asset_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["false"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_VULNERABILITY" class="java.lang.String">
+		<parameterDescription><![CDATA[Clause that can filter vulnerabilities (vulnerability_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SITE_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of sites to filter.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ASSET_GROUP_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of asset groups to filter.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TAG_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of tags to filter.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORDER_BY" class="java.lang.String">
+		<parameterDescription><![CDATA[ORDER BY clause to sort solutions by remediation impact.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["risk_score DESC"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LIMIT" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT 1;]]>
 	</queryString>
@@ -52,6 +88,7 @@
 		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
+	<variable name="TOTAL_ASSETS" class="java.lang.Integer" resetType="None"/>
 	<title>
 		<band height="45" splitType="Stretch">
 			<subreport>
@@ -62,66 +99,91 @@
 				<subreportParameter name="REPORT_NAME">
 					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="SORT_BY">
-					<subreportParameterExpression><![CDATA[$P{SORT_BY}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="NUMBER_OF_SOLUTIONS">
-					<subreportParameterExpression><![CDATA[$P{NUMBER_OF_SOLUTIONS}]]></subreportParameterExpression>
+				<subreportParameter name="COUNT">
+					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="TITLE">
-					<subreportParameterExpression><![CDATA[msg("Top {0} Remediations by {1}", $P{NUMBER_OF_SOLUTIONS}, 
-$P{SORT_BY}.equals("risk_score") ? "Risk" : $P{SORT_BY}.equals("assets") ? "Affected Assets" : $P{SORT_BY}.equals("vulnerabilities") ? "Vulnerabilities" : $P{SORT_BY}.equals("exploits") ? "Exploit Exposures" : $P{SORT_BY}.equals("malware_kits") ? "Malware Exposures" : "")]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[msg("Top {0} Remediations by {1}", $P{LIMIT}, 
+$P{ORDER_BY}.contains("risk_score") ? "Risk" : $P{ORDER_BY}.contains("assets") ? "Affected Assets" : $P{ORDER_BY}.contains("vulnerabilities") ? "Vulnerabilities" : $P{ORDER_BY}.contains("exploits") ? "Exploit Exposures" : $P{ORDER_BY}.contains("malware_kits") ? "Malware Exposures" : "")]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_SITE">
+					<subreportParameterExpression><![CDATA[$P{SITE_NAMES}.isEmpty() ? "false" : "name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET_GROUP">
+					<subreportParameterExpression><![CDATA[$P{ASSET_GROUP_NAMES}.isEmpty() ? "false" : "name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_TAG">
+					<subreportParameterExpression><![CDATA[$P{TAG_NAMES}.isEmpty() ? "false" : "name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET}]]></subreportParameterExpression>
+				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/title.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/title" + ($P{TITLE_PAGE} ? "-page" : "") + ".jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</title>
 	<detail>
-		<band height="229">
+		<band height="150">
 			<subreport>
-				<reportElement positionType="Float" x="0" y="130" width="522" height="99" uuid="63572b53-c4cf-4762-97dd-a95bb71a8049"/>
+				<reportElement positionType="Float" x="1" y="0" width="522" height="150" uuid="63572b53-c4cf-4762-97dd-a95bb71a8049"/>
 				<subreportParameter name="REPORT_NAME">
 					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="SORT_BY">
-					<subreportParameterExpression><![CDATA[$P{SORT_BY}]]></subreportParameterExpression>
+				<subreportParameter name="SHOW_SUMMARY_HEADER">
+					<subreportParameterExpression><![CDATA[$P{SHOW_SUMMARY_HEADER}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="NUMBER_OF_SOLUTIONS">
-					<subreportParameterExpression><![CDATA[$P{NUMBER_OF_SOLUTIONS}]]></subreportParameterExpression>
+				<subreportParameter name="SHOW_REMEDIATION_DETAILS">
+					<subreportParameterExpression><![CDATA[$P{SHOW_REMEDIATION_DETAILS}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET} + 
+($P{SITE_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
+"   SELECT asset_id " +
+"   FROM dim_site_asset " +
+"      JOIN dim_site USING (site_id) " +
+"   WHERE name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
+")") +
+($P{ASSET_GROUP_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
+"   SELECT asset_id " +
+"   FROM dim_asset_group_asset " +
+"      JOIN dim_asset_group USING (asset_group_id) " +
+"   WHERE name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
+")")+
+($P{TAG_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
+"   SELECT asset_id " +
+"   FROM dim_tag_asset " +
+"      JOIN dim_tag USING (tag_id) " +
+"   WHERE name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
+")")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_VULNERABILITY">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_VULNERABILITY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ORDER_BY">
+					<subreportParameterExpression><![CDATA[$P{ORDER_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
+				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="TOTAL_ASSETS" toVariable="TOTAL_ASSETS"/>
 				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/remediation/remediation-listing.jasper"]]></subreportExpression>
-			</subreport>
-			<subreport>
-				<reportElement positionType="Float" x="0" y="0" width="522" height="129" uuid="ea056a2f-0a9f-4381-b1e2-b70917bcfc53"/>
-				<subreportParameter name="NUMBER_OF_SOLUTIONS">
-					<subreportParameterExpression><![CDATA[$P{NUMBER_OF_SOLUTIONS}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="REPORT_TEMPLATES">
-					<subreportParameterExpression><![CDATA[$P{REPORT_TEMPLATES}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="SORT_BY">
-					<subreportParameterExpression><![CDATA[$P{SORT_BY}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="BASE_DIR">
-					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/remediation/remediation-impact-header.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
 	<pageFooter>
 		<band height="20" splitType="Prevent">
 			<textField evaluationTime="Auto">
-				<reportElement x="469" y="0" width="53" height="20" forecolor="#333333" uuid="85122008-fdcc-4d29-982f-4adefb7072be"/>
+				<reportElement x="370" y="0" width="152" height="20" forecolor="#333333" uuid="85122008-fdcc-4d29-982f-4adefb7072be">
+					<printWhenExpression><![CDATA[!$P{TITLE_PAGE} || ($P{TITLE_PAGE} && $V{CURRENT_PAGE_NUMBER} > 1.0)]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="11"/>
 				</textElement>
@@ -129,4 +191,37 @@ $P{SORT_BY}.equals("risk_score") ? "Risk" : $P{SORT_BY}.equals("assets") ? "Affe
 			</textField>
 		</band>
 	</pageFooter>
+	<summary>
+		<band height="30">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="1" width="523" height="29" uuid="e3819e18-56ce-4d38-af50-4fe44bf23c02">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[$P{SCOPE_APPENDIX}]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_SITE">
+					<subreportParameterExpression><![CDATA[$P{SITE_NAMES}.isEmpty() ? "false" : "name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET_GROUP">
+					<subreportParameterExpression><![CDATA[$P{ASSET_GROUP_NAMES}.isEmpty() ? "false" : "name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_TAG">
+					<subreportParameterExpression><![CDATA[$P{TAG_NAMES}.isEmpty() ? "false" : "name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/appendices/scope.jasper"]]></subreportExpression>
+			</subreport>
+			<break>
+				<reportElement x="0" y="0" width="99" height="1" uuid="f8323d38-d0c4-46ca-9125-61d9355281a3">
+					<printWhenExpression><![CDATA[$P{SCOPE_APPENDIX}]]></printWhenExpression>
+				</reportElement>
+			</break>
+		</band>
+	</summary>
 </jasperReport>

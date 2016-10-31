@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-12T10:19:53 -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="assets-and-vulnerabilities-discovered-trend" pageWidth="523" pageHeight="400" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="264a987a-9c3b-46a7-9ab8-56b86d279c0f">
+<!-- 2016-10-31T13:44:46 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="assets-and-vulnerabilities-line-bar-large" pageWidth="523" pageHeight="400" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="264a987a-9c3b-46a7-9ab8-56b86d279c0f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
 	<parameter name="REPORT_NAME" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -20,35 +24,36 @@
 		<parameterDescription><![CDATA[The interval in data points for the trend.]]></parameterDescription>
 		<defaultValueExpression><![CDATA["7 Days"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SORT_BY" class="java.lang.String">
-		<parameterDescription><![CDATA[The field to prioritize by, one of: assets, risk_score, vulnerabilities, malware_kits, or exploits.]]></parameterDescription>
-		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[WHERE clause to filter assets (asset_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="NUMBER_OF_SOLUTIONS" class="java.lang.Integer">
-		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
-	</parameter>
-	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
-		<parameterDescription><![CDATA[]]></parameterDescription>
-		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	<parameter name="WHERE_FILTER_VULNERABILITY" class="java.lang.String">
+		<parameterDescription><![CDATA[WHERE clause to filter vulnerabilities (vulnerability_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[WITH
    dates AS (
       SELECT row_number() over () AS row, CAST(generate_series AS date) AS day
-      FROM generate_series(to_date($P{TREND_END_DATE}::TEXT, 'YYYY-MM-DD'), to_date($P{TREND_START_DATE}::TEXT, 'YYYY-MM-DD'), -($P{TREND_INTERVAL}::INTERVAL))
+      FROM generate_series('$P!{TREND_END_DATE}',  '$P!{TREND_START_DATE}', -(INTERVAL '$P!{TREND_INTERVAL}'))
    ),
    date_ranges AS (
-      SELECT ((d2.day) + INTERVAL '1 day')::DATE AS start, d1.day AS end
-      FROM dates d1
-         JOIN dates d2 ON d1.row + 1 = d2.row  
+      SELECT CASE WHEN row = (SELECT MAX(row) FROM dates) THEN '$P!{TREND_START_DATE}' ELSE (((day) - INTERVAL '$P!{TREND_INTERVAL}') + INTERVAL '1 day')::DATE END AS start, day AS end
+      FROM dates
+   ),
+   filtered_vulnerabilities AS (
+      SELECT day, asset_id, COUNT(DISTINCT vulnerability_id) AS vulnerabilities
+      FROM fact_asset_vulnerability_finding_date
+      WHERE $P!{WHERE_FILTER_ASSET} AND $P!{WHERE_FILTER_VULNERABILITY} AND day <= '$P!{TREND_END_DATE}' AND day >= '$P!{TREND_START_DATE}'
+      GROUP BY day, asset_id
    ),
    assets_by_date_range AS (
-      SELECT DISTINCT ON (asset_id, dr.end) asset_id, dr.end AS day, fad.vulnerabilities
-      FROM fact_asset_date fad
+      SELECT DISTINCT ON (asset_id, dr.end) asset_id, dr.end AS day, vulnerabilities
+      FROM filtered_vulnerabilities fv
          CROSS JOIN date_ranges dr
-      WHERE fad.day <= dr.end AND fad.day >= dr.start
-      ORDER BY asset_id, dr.end, fad.day DESC
+      WHERE fv.day <= dr.end AND fv.day >= dr.start
+      ORDER BY asset_id, dr.end, fv.day DESC
    ),
    date_series AS (
       SELECT day, COUNT(DISTINCT asset_id) AS assets, COALESCE(SUM(vulnerabilities), 0)::BIGINT AS vulnerabilities
@@ -58,12 +63,14 @@
    end_summary AS (
       SELECT vulnerabilities AS end_vulnerabilities, assets AS end_assets
       FROM date_series 
+         RIGHT OUTER JOIN dates USING (day)
       ORDER BY day DESC
       LIMIT 1
    ),
    start_summary AS (
       SELECT vulnerabilities AS start_vulnerabilities, assets AS start_assets
       FROM date_series 
+         RIGHT OUTER JOIN dates USING (day)
       ORDER BY day ASC
       LIMIT 1
    )
@@ -83,11 +90,23 @@ ORDER BY day ASC]]>
 	<field name="end_vulnerabilities" class="java.lang.Long"/>
 	<field name="start_assets" class="java.lang.Long"/>
 	<field name="end_assets" class="java.lang.Long"/>
+	<variable name="TOTAL_END_VULNERABILITIES" class="java.lang.Long" calculation="First">
+		<variableExpression><![CDATA[$F{end_vulnerabilities}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_START_VULNERABILITIES" class="java.lang.Long" calculation="First">
+		<variableExpression><![CDATA[$F{start_vulnerabilities}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_END_ASSETS" class="java.lang.Long" calculation="First">
+		<variableExpression><![CDATA[$F{end_assets}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_START_ASSETS" class="java.lang.Long" calculation="First">
+		<variableExpression><![CDATA[$F{start_assets}]]></variableExpression>
+	</variable>
 	<summary>
-		<band height="348">
+		<band height="351">
 			<multiAxisChart>
 				<chart isShowLegend="false" evaluationTime="Report">
-					<reportElement positionType="Float" x="0" y="23" width="523" height="262" uuid="240a14d2-c307-4f67-967c-45da954a0605"/>
+					<reportElement positionType="Float" x="0" y="0" width="523" height="285" uuid="240a14d2-c307-4f67-967c-45da954a0605"/>
 					<chartTitle position="Top"/>
 					<chartSubtitle/>
 					<chartLegend position="Bottom"/>
@@ -164,7 +183,7 @@ ORDER BY day ASC]]>
 										</tickLabelFont>
 									</axisFormat>
 								</categoryAxisFormat>
-								<valueAxisLabelExpression><![CDATA["Affected Assets"]]></valueAxisLabelExpression>
+								<valueAxisLabelExpression><![CDATA["Assets"]]></valueAxisLabelExpression>
 								<valueAxisFormat>
 									<axisFormat tickLabelColor="#666666" tickLabelMask="#,###" verticalTickLabels="false" axisLineColor="#999999">
 										<tickLabelFont>
@@ -177,15 +196,6 @@ ORDER BY day ASC]]>
 					</axis>
 				</multiAxisPlot>
 			</multiAxisChart>
-			<textField>
-				<reportElement positionType="Float" x="0" y="0" width="523" height="20" uuid="e4e91dfb-12b1-4cc8-94c2-d79eb63942c1">
-					<property name="net.sf.jasperreports.export.html.id" value="trend_by_assets_subtitle"/>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font size="13" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Assets and Vulnerabilities Discovered"]]></textFieldExpression>
-			</textField>
 			<textField>
 				<reportElement positionType="Float" x="354" y="296" width="140" height="16" uuid="8a36cef5-2303-49c4-9073-b670c9049f42"/>
 				<box leftPadding="3"/>
@@ -219,7 +229,7 @@ ORDER BY day ASC]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[msg("(was {0})", $F{start_assets})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[msg("(was {0})", NumberFormat.getIntegerInstance().format($V{TOTAL_START_ASSETS}))]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement key="" positionType="Float" x="270" y="312" width="93" height="16" uuid="3f657b1e-a4cd-408a-9c4f-39ae33048263">
@@ -230,7 +240,7 @@ ORDER BY day ASC]]>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{end_assets} != 0 ? NumberFormat.getIntegerInstance($P{REPORT_LOCALE}).format($F{end_assets}) : $R{NA}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{TOTAL_END_ASSETS} <= 0.0 ? NumberFormat.getIntegerInstance().format($V{TOTAL_END_ASSETS}) : "N/A"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement positionType="Float" x="130" y="312" width="117" height="16" forecolor="#999999" uuid="dbdb67d1-a4ee-49f9-8ec8-a5dec3538890">
@@ -241,36 +251,26 @@ ORDER BY day ASC]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[msg("(was {0})", $F{start_vulnerabilities})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[msg("(was {0})", NumberFormat.getIntegerInstance().format($V{TOTAL_START_VULNERABILITIES}))]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement positionType="Float" x="130" y="328" width="50" height="13" forecolor="#999999" uuid="0ab9a433-7989-40df-a8ae-e2a99057d1cc">
-					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} < $F{start_vulnerabilities}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$V{TOTAL_START_VULNERABILITIES} > 0.0]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA["decrease"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{TOTAL_START_VULNERABILITIES} != 0.0 && $V{TOTAL_END_VULNERABILITIES} <= $V{TOTAL_START_VULNERABILITIES} ? "decrease" : "increase"]]></textFieldExpression>
 			</textField>
-			<textField evaluationTime="Report">
-				<reportElement positionType="Float" x="130" y="328" width="51" height="13" forecolor="#999999" uuid="176f466d-0ecd-4a24-bc0e-141d16400b1f">
-					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} >= $F{start_vulnerabilities}]]></printWhenExpression>
-				</reportElement>
-				<box leftPadding="3"/>
-				<textElement verticalAlignment="Middle">
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA["increase"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report" pattern="#,##0.0 %">
+			<textField evaluationTime="Report" pattern="##0.0%">
 				<reportElement positionType="Float" x="83" y="328" width="46" height="13" forecolor="#007F00" uuid="7f2149b3-99d7-457f-89e1-aba2dc40134e">
-					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} <= $F{start_vulnerabilities}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$V{TOTAL_START_VULNERABILITIES} != 0.0 && $V{TOTAL_END_VULNERABILITIES} <= $V{TOTAL_START_VULNERABILITIES}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[((float)$F{end_vulnerabilities} - $F{start_vulnerabilities}) / $F{start_vulnerabilities}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{TOTAL_END_VULNERABILITIES}.doubleValue() - $V{TOTAL_START_VULNERABILITIES}) / $V{TOTAL_START_VULNERABILITIES}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement key="" positionType="Float" x="37" y="312" width="93" height="16" uuid="403c3042-05d3-4991-85f6-de06c123ff5e">
@@ -280,45 +280,35 @@ ORDER BY day ASC]]>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{end_vulnerabilities} != 0 ? NumberFormat.getIntegerInstance($P{REPORT_LOCALE}).format($F{end_vulnerabilities}) : $R{NA}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{TOTAL_END_VULNERABILITIES} <= 0.0 ? NumberFormat.getIntegerInstance().format($V{TOTAL_END_VULNERABILITIES}) : "N/A"]]></textFieldExpression>
 			</textField>
-			<textField evaluationTime="Report" pattern="#,##0.0 %">
+			<textField evaluationTime="Report" pattern="##0.0%">
 				<reportElement positionType="Float" x="83" y="328" width="46" height="13" forecolor="#FF0000" uuid="f87418da-a2b5-4f5c-a473-45f6eccd7514">
-					<printWhenExpression><![CDATA[$F{start_vulnerabilities} != 0 && $F{end_vulnerabilities} > $F{start_vulnerabilities}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$V{TOTAL_START_VULNERABILITIES} != 0.0 && $V{TOTAL_END_VULNERABILITIES} > $V{TOTAL_START_VULNERABILITIES}]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[((float)$F{end_vulnerabilities} - $F{start_vulnerabilities}) / $F{start_vulnerabilities}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{TOTAL_END_VULNERABILITIES}.doubleValue() - $V{TOTAL_START_VULNERABILITIES}) / $V{TOTAL_START_VULNERABILITIES}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement positionType="Float" x="363" y="329" width="50" height="13" forecolor="#999999" uuid="a24e596e-c1b0-4d74-91ee-144529ff13a7">
-					<printWhenExpression><![CDATA[$F{start_assets} != 0 && $F{end_assets} < $F{start_assets}]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$V{TOTAL_START_ASSETS} > 0.0]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA["decrease"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{TOTAL_START_ASSETS} != 0.0 && $V{TOTAL_END_ASSETS} <= $V{TOTAL_START_ASSETS} ? "decrease" : "increase"]]></textFieldExpression>
 			</textField>
-			<textField evaluationTime="Report">
-				<reportElement positionType="Float" x="363" y="329" width="51" height="13" forecolor="#999999" uuid="7d741dd7-9945-4040-8f73-b43890876901">
-					<printWhenExpression><![CDATA[$F{start_assets} != 0 && $F{end_assets} >= $F{start_assets}]]></printWhenExpression>
-				</reportElement>
-				<box leftPadding="3"/>
-				<textElement verticalAlignment="Middle">
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA["increase"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report" pattern="#,##0.0 %">
+			<textField evaluationTime="Report" pattern="##0.0%">
 				<reportElement positionType="Float" x="313" y="329" width="50" height="13" forecolor="#000000" uuid="af7963ac-fc77-4d19-b192-07f7d77f23eb">
-					<printWhenExpression><![CDATA[$F{start_assets} > 0]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$V{TOTAL_START_ASSETS} > 0.0]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[((float)$F{end_assets} - $F{start_assets}) / $F{start_assets}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{TOTAL_END_ASSETS}.doubleValue() - $V{TOTAL_START_ASSETS}) / $V{TOTAL_START_ASSETS}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

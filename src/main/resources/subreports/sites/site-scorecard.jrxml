@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-31T15:35:26 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="site-scorecard" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="112"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="322"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="671"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_SITE" class="java.lang.String">
+		<parameterDescription><![CDATA[Filter that can be used to filter on site_id to restrict the contents of this report.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORDER_BY" class="java.lang.String">
+		<parameterDescription><![CDATA[ORDER BY clause to use to sort the sites by.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["name ASC"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH
+   sites AS (
+      SELECT site_id, COUNT(DISTINCT asset_id) AS assets, 
+         COALESCE(SUM(vulnerabilities), 0) AS vulnerabilities, 
+         COALESCE(SUM(critical_vulnerabilities), 0) AS critical_vulnerabilities, 
+         COALESCE(SUM(severe_vulnerabilities), 0) AS severe_vulnerabilities, 
+         COALESCE(SUM(moderate_vulnerabilities), 0) AS moderate_vulnerabilities, 
+         COALESCE(SUM(malware_kits), 0) AS malware_kits, 
+         COALESCE(SUM(exploits), 0) AS exploits, 
+         COALESCE(SUM(risk_score), 0) AS risk_score, 
+         COALESCE(SUM(vulnerabilities_with_malware_kit), 0) AS vulnerabilities_with_malware_kit, 
+         COALESCE(SUM(vulnerabilities_with_exploit), 0) AS vulnerabilities_with_exploit,
+         AVG(risk_score) AS avg_risk_score,
+         AVG(vulnerabilities) AS avg_vulnerabilities, 
+         AVG(malware_kits) AS avg_malware_kits, 
+         AVG(exploits) AS avg_exploits,
+         MAX(risk_score) AS max_risk_score,
+         MAX(vulnerabilities) AS max_vulnerabilities, 
+         MAX(malware_kits) AS max_malware_kits, 
+         MAX(exploits) AS max_exploits,
+         COALESCE(SUM(CASE WHEN assessed_for_vulnerabilities THEN 1 ELSE 0 END), 0) AS assessed
+       FROM fact_asset
+          JOIN dim_asset USING (asset_id)
+          JOIN dim_site_asset USING (asset_id)
+       GROUP BY site_id
+   ),
+   aggregate_scores AS (
+      SELECT AVG(risk_score / assets) AS total_avg_risk_score
+      FROM sites
+   ),
+   ordered AS (
+      SELECT *, (SELECT total_avg_risk_score FROM aggregate_scores) AS total_avg_risk_score
+      FROM sites
+         JOIN dim_site USING (site_id)
+      WHERE $P!{WHERE_FILTER_SITE} 
+      ORDER BY $P!{ORDER_BY}
+   )
+SELECT row_number() OVER () AS row, * 
+FROM ordered]]>
+	</queryString>
+	<field name="row" class="java.lang.Long"/>
+	<field name="site_id" class="java.lang.Integer"/>
+	<field name="assets" class="java.lang.Long"/>
+	<field name="vulnerabilities" class="java.math.BigDecimal"/>
+	<field name="critical_vulnerabilities" class="java.math.BigDecimal"/>
+	<field name="severe_vulnerabilities" class="java.math.BigDecimal"/>
+	<field name="moderate_vulnerabilities" class="java.math.BigDecimal"/>
+	<field name="malware_kits" class="java.lang.Long"/>
+	<field name="exploits" class="java.lang.Long"/>
+	<field name="risk_score" class="java.lang.Double"/>
+	<field name="vulnerabilities_with_malware_kit" class="java.lang.Long"/>
+	<field name="vulnerabilities_with_exploit" class="java.lang.Long"/>
+	<field name="avg_risk_score" class="java.lang.Double"/>
+	<field name="avg_vulnerabilities" class="java.math.BigDecimal"/>
+	<field name="avg_malware_kits" class="java.math.BigDecimal"/>
+	<field name="avg_exploits" class="java.math.BigDecimal"/>
+	<field name="max_risk_score" class="java.lang.Double"/>
+	<field name="max_vulnerabilities" class="java.lang.Long"/>
+	<field name="max_malware_kits" class="java.lang.Integer"/>
+	<field name="max_exploits" class="java.lang.Integer"/>
+	<field name="assessed" class="java.lang.Long"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="importance" class="java.lang.String"/>
+	<field name="dynamic_targets" class="java.lang.Boolean"/>
+	<field name="risk_factor" class="java.lang.Float"/>
+	<field name="last_scan_id" class="java.lang.Long"/>
+	<field name="previous_scan_id" class="java.lang.Long"/>
+	<field name="scan_template" class="java.lang.String"/>
+	<field name="scan_template_id" class="java.lang.String"/>
+	<field name="scan_engine" class="java.lang.String"/>
+	<field name="scan_engine_id" class="java.lang.Integer"/>
+	<field name="organization_name" class="java.lang.String"/>
+	<field name="organization_url" class="java.lang.String"/>
+	<field name="organization_contact" class="java.lang.String"/>
+	<field name="organization_job_title" class="java.lang.String"/>
+	<field name="organization_email" class="java.lang.String"/>
+	<field name="organization_phone" class="java.lang.String"/>
+	<field name="organization_address" class="java.lang.String"/>
+	<field name="organization_city" class="java.lang.String"/>
+	<field name="organization_state" class="java.lang.String"/>
+	<field name="organization_country" class="java.lang.String"/>
+	<field name="organization_zip" class="java.lang.String"/>
+	<field name="total_avg_risk_score" class="java.lang.Double"/>
+	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="GRADE" class="java.lang.String">
+		<variableExpression><![CDATA[$F{avg_risk_score} <= ($F{total_avg_risk_score} - (.47725 * $F{total_avg_risk_score})) ? "A" :
+$F{avg_risk_score} <= ($F{total_avg_risk_score} - (.34135 * $F{total_avg_risk_score})) ? "B" :
+$F{avg_risk_score} <= ($F{total_avg_risk_score} - (-.34135 * $F{total_avg_risk_score})) ? "C" :
+$F{avg_risk_score} <= ($F{total_avg_risk_score} - (-.47725 * $F{total_avg_risk_score})) ? "D" : "F"]]></variableExpression>
+	</variable>
+	<detail>
+		<band height="491">
+			<textField>
+				<reportElement x="64" y="0" width="226" height="22" uuid="aa0f8875-31bd-480b-9902-c1e519eaa356">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Site: " + $F{name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="230" y="75" width="75" height="12" uuid="6fce28a6-5955-4034-bff1-9f51f56933d9"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vulnerabilities}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="65" y="75" width="60" height="12" uuid="e6971c75-0007-438d-bb38-7b54bd3b97e2"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{assets}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="155" y="97" width="75" height="12" uuid="6c0cbc94-f9a7-4346-ab8e-d193411c24a4">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{avg_risk_score}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="155" y="87" width="75" height="10" forecolor="#919191" uuid="cfb64981-0e5a-406e-9a33-a0fe0877ed85">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Avg]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="65" width="60" height="10" forecolor="#919191" uuid="5b37f24c-29d3-44c0-9a03-dee28558b652">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Assets]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="155" y="75" width="75" height="12" uuid="4c45abc6-0b16-49ad-b117-f777dea34adf"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{risk_score}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="155" y="65" width="75" height="10" forecolor="#919191" uuid="d205aad3-72d8-495b-ba37-18dcb999b1f8">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Risk Score]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="65" width="75" height="10" forecolor="#919191" uuid="b1df6fa6-19e6-4f96-9e0e-838e03277821">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Vulnerabilities]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="87" width="75" height="10" forecolor="#919191" uuid="14547566-f2bf-471c-8e47-c42b45ee03de">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Avg]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="230" y="97" width="75" height="12" uuid="3efa00a8-ac90-4c03-81f9-4d5d2c12a46a"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{avg_vulnerabilities}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="305" y="75" width="75" height="12" uuid="096fd7d9-d87d-4d67-94bb-82931d256083"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{exploits}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="305" y="87" width="75" height="10" forecolor="#919191" uuid="e61aa576-80b3-4154-8906-757b440a31e8">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Avg]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="305" y="97" width="75" height="12" uuid="a89ef268-b019-47c4-a1fd-ae51cc5c51bd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{avg_exploits}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="380" y="75" width="75" height="12" uuid="2c233a44-7e68-4cf5-a4b1-2ce9df05a4b3">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{malware_kits}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="380" y="87" width="75" height="10" forecolor="#919191" uuid="86f4c9fa-90a8-4d28-bcaa-0b38509a6fcd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Avg]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="380" y="97" width="75" height="12" uuid="07247dfd-add3-43df-950a-0b87ea123e53"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{avg_malware_kits}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="0" y="1" width="64" height="64" forecolor="#FFFFFF" backcolor="#35DC39" uuid="7b7fe3e8-335c-47c6-bffd-63b1a494912c">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[$F{avg_risk_score} <= ($F{total_avg_risk_score} - (.47725 * $F{total_avg_risk_score}))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26"/>
+				</textElement>
+				<textFieldExpression><![CDATA["A"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="0" y="1" width="64" height="64" forecolor="#FFFFFF" backcolor="#36713C" uuid="912362eb-5cd3-46aa-b235-bf9435b33461">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<printWhenExpression><![CDATA[$F{avg_risk_score} > ($F{total_avg_risk_score} - (.47725 * $F{total_avg_risk_score})) &&
+$F{avg_risk_score} <= ($F{total_avg_risk_score} - (.34135 * $F{total_avg_risk_score}))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26"/>
+				</textElement>
+				<textFieldExpression><![CDATA["B"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="0" y="1" width="64" height="64" forecolor="#FFFFFF" backcolor="#828282" uuid="481ac07e-ada9-46a8-a00c-0677d583bc4f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<printWhenExpression><![CDATA[$F{avg_risk_score} > ($F{total_avg_risk_score} - (.34135 * $F{total_avg_risk_score})) &&$F{avg_risk_score} <= ($F{total_avg_risk_score} - (-.34135 * $F{total_avg_risk_score}))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26"/>
+				</textElement>
+				<textFieldExpression><![CDATA["C"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="0" y="1" width="64" height="64" forecolor="#FFFFFF" backcolor="#D6B850" uuid="1af16384-e225-4447-93db-ec93aca0d135">
+					<printWhenExpression><![CDATA[$F{avg_risk_score} > ($F{total_avg_risk_score} - (-.34135 * $F{total_avg_risk_score})) &&$F{avg_risk_score} <= ($F{total_avg_risk_score} - (-.47725 * $F{total_avg_risk_score}))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26"/>
+				</textElement>
+				<textFieldExpression><![CDATA["D"]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement mode="Opaque" x="0" y="1" width="64" height="64" forecolor="#FFFFFF" backcolor="#B90005" uuid="342dc3c3-fceb-4fa6-b945-67c210ccdb22">
+					<printWhenExpression><![CDATA[$F{avg_risk_score} >= ($F{total_avg_risk_score} - (-.47725 * $F{total_avg_risk_score}))]]></printWhenExpression>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26"/>
+				</textElement>
+				<textFieldExpression><![CDATA["F"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="305" y="65" width="75" height="10" forecolor="#919191" uuid="02a09984-13c9-4d0c-8fca-4f7f6524561c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Exploits]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="65" width="75" height="10" forecolor="#919191" uuid="62559870-030b-4367-b824-6392f1b5b72b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Malware]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="523" height="1" forecolor="#DEDEDE" uuid="784b3b91-7469-4d75-82c3-454ceb68d4dc">
+					<printWhenExpression><![CDATA[$F{row} > .9]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="155" y="109" width="75" height="10" forecolor="#919191" uuid="0d5b065f-e9e2-41fa-ae43-a8359850615b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Max]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="155" y="119" width="75" height="12" uuid="e0abc6e8-4ebf-4027-bcd6-078167f96ab5"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{max_risk_score}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="230" y="109" width="75" height="10" forecolor="#919191" uuid="9fa7f854-4b0c-44b1-b9af-cfbaadf3d347">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Max]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="230" y="119" width="75" height="12" uuid="41bb8d4b-5326-4dee-89a3-bba93350d3ca">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{max_vulnerabilities}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="305" y="119" width="75" height="12" uuid="b2e5611a-2c0a-4bf8-be60-d162f231f318">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{max_exploits}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="305" y="109" width="75" height="10" forecolor="#919191" uuid="ab0aebe5-a9d3-4190-8780-0108b9cf3a8b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Max]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="109" width="75" height="10" forecolor="#919191" uuid="7b4debc3-c9fb-4246-a765-7a792c32308d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Max]]></text>
+			</staticText>
+			<textField pattern="#,###">
+				<reportElement x="380" y="119" width="75" height="12" uuid="705b6b43-6bc4-4684-8baa-8c9ad1eb16c5"/>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{max_malware_kits}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="64" y="22" width="458" height="42" forecolor="#787878" uuid="d008422b-3c88-4fe8-8c42-eaae04e46b2b"/>
+				<box leftPadding="3"/>
+				<textFieldExpression><![CDATA["Your site's grade of " + $V{GRADE} + " is based on its average asset risk score of " + NumberFormat.getIntegerInstance().format($F{avg_risk_score}) + ", which is " + new DecimalFormat("#,###.0%").format((Math.abs($F{total_avg_risk_score} - $F{avg_risk_score})) / $F{total_avg_risk_score}) + " " + ($F{avg_risk_score} < $F{total_avg_risk_score} ? "less" : "more") + " than the average asset risk score of " + NumberFormat.getIntegerInstance().format($F{total_avg_risk_score}) + " across all sites. Grades are ranked using a normal curve against the average amongst all sites."]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="348" width="523" height="31" uuid="5ad5f69a-6a08-4a47-95a3-b3d07b2a9e2d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[10]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ORDER_BY">
+					<subreportParameterExpression><![CDATA["risk_score DESC"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/assets/asset-listing.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="0" y="332" width="522" height="16" forecolor="#919191" uuid="240a9ef1-af17-4f17-93a1-92dbc3a39a87">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Riskiest Assets]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="87" width="60" height="10" forecolor="#919191" uuid="1b59f929-cd4f-4f5b-9528-b80498a84044">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Assessed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="109" width="60" height="10" forecolor="#919191" uuid="77e3803f-bb3e-4544-8923-73a2ef40483f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Discovered]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="125" y="97" width="30" height="12" uuid="6079c818-f380-4084-b6b6-bdfa026d7a94">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{assessed}.doubleValue() / $F{assets}]]></textFieldExpression>
+				<patternExpression><![CDATA[$F{assessed}.doubleValue() / $F{assets} < .01 ? "(#.00%)" :
+$F{assessed}.doubleValue() / $F{assets} <  .10 ? "(##.0%)" : "(##%)"]]></patternExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="125" y="119" width="30" height="12" uuid="6bcbbf4f-9649-4d58-aeb0-9e891fb923f6">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{assets} - $F{assessed}.doubleValue()) / $F{assets}]]></textFieldExpression>
+				<patternExpression><![CDATA[(($F{assets} - $F{assessed}.doubleValue()) / $F{assets}) < .0000001 ? "(0%)" :
+(($F{assets} - $F{assessed}.doubleValue()) / $F{assets}) < .001 ? "(<.1%)" :
+(($F{assets} - $F{assessed}.doubleValue()) / $F{assets}) < .01 ? "(#.00%)" :
+(($F{assets} - $F{assessed}.doubleValue()) / $F{assets}) <  .10 ? "(##.0%)" : "(##%)"]]></patternExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="65" y="97" width="60" height="12" uuid="d75f51bb-0c62-4577-af75-58cab6f77f1d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{assessed}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,###">
+				<reportElement x="65" y="119" width="60" height="12" uuid="975d3f67-c430-40c9-bba6-b918478b0fd1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{assets} - $F{assessed}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="152" width="260" height="180" uuid="41856ff7-83ae-4cb1-b716-e91f2fca51b6">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR}+ "/subreports/charts/assets-by-operating-system-pie-medium.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="0" y="136" width="260" height="16" forecolor="#A2A2A2" uuid="66bd0dbf-cc13-4fe2-8e1e-72f1c977bc40"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Operating Systems]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="262" y="152" width="260" height="180" uuid="93e4b652-691a-437e-a02b-7d20b3548ad5">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CRITICAL">
+					<subreportParameterExpression><![CDATA[$F{critical_vulnerabilities}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SEVERE">
+					<subreportParameterExpression><![CDATA[$F{severe_vulnerabilities}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MODERATE">
+					<subreportParameterExpression><![CDATA[$F{moderate_vulnerabilities}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EXPLOITABLE_VULNERABILITIES">
+					<subreportParameterExpression><![CDATA[$F{vulnerabilities_with_exploit}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MALWARE_VULNERABILITIES">
+					<subreportParameterExpression><![CDATA[$F{vulnerabilities_with_malware_kit}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR}+ "/subreports/charts/vulnerability-severity-listing-bar-medium.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="262" y="136" width="260" height="16" forecolor="#A2A2A2" uuid="696b0431-8625-4b3c-a1d0-902d78ad2023">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Risk Overview]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="400" width="144" height="91" uuid="ef93edb5-4a01-43f8-abe9-f8c46a2147bc">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER">
+					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[12]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR}+ "/subreports/assets/most-common-services-listing.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="384" width="144" height="16" forecolor="#919191" uuid="d4346d56-5cdf-429e-819a-fcd50a2802be"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Most Common Services]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="147" y="400" width="144" height="91" uuid="d1044a31-73aa-4b7b-94db-e24322b6f995">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER">
+					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[12]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR}+ "/subreports/assets/most-vulnerable-services-listing.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement positionType="Float" x="147" y="384" width="144" height="16" forecolor="#919191" uuid="45dad6ed-bcda-475b-9cd0-5e55c96aa936"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Most Vulnerable Services]]></text>
+			</staticText>
+			<subreport>
+				<reportElement positionType="Float" x="294" y="400" width="228" height="91" uuid="0b62c673-8d46-4b91-8049-5073a0c7e357">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER">
+					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[6]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR}+ "/subreports/assets/highest-risk-vulnerability-listing.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement positionType="Float" x="294" y="384" width="228" height="16" forecolor="#919191" uuid="1be0e714-45ed-47f2-a456-ded0ca5727f3"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Highest Risk Vulnerabilities]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

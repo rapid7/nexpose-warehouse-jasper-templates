@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-31T12:38:24 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="scope-appendix" pageWidth="523" pageHeight="100" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="112"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_SITE" class="java.lang.String">
+		<parameterDescription><![CDATA[Filter indicating which sites were in scope (site_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["false"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_ASSET_GROUP" class="java.lang.String">
+		<parameterDescription><![CDATA[Filter indicating which asset groups were in scope (asset_group_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["false"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_TAG" class="java.lang.String">
+		<parameterDescription><![CDATA[Filter indicating which tags were in scope (tag_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["false"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[Filter indicating which assets were in scope (asset_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["false"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+   (SELECT COUNT(DISTINCT site_id) FROM dim_site WHERE $P!{WHERE_FILTER_SITE}) AS sites,
+   (SELECT COUNT(DISTINCT asset_group_id) FROM dim_asset_group WHERE $P!{WHERE_FILTER_ASSET_GROUP}) AS asset_groups,
+   (SELECT COUNT(DISTINCT tag_id) FROM dim_tag WHERE $P!{WHERE_FILTER_TAG}) AS tags,
+   (SELECT COUNT(DISTINCT asset_id) FROM dim_asset WHERE $P!{WHERE_FILTER_ASSET}) AS assets]]>
+	</queryString>
+	<field name="sites" class="java.lang.Long"/>
+	<field name="asset_groups" class="java.lang.Long"/>
+	<field name="tags" class="java.lang.Long"/>
+	<field name="assets" class="java.lang.Long"/>
+	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<detail>
+		<band height="100">
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="18" width="523" height="81" uuid="93992e8d-3f1e-4303-ae46-370074aba8b8">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{assets} > 0.0 ? NumberFormat.getIntegerInstance().format($F{assets}) + " assets\n" : "") +
+($F{sites} > 0.0 ? NumberFormat.getIntegerInstance().format($F{sites}) + " sites\n" : "") + 
+($F{asset_groups} > 0.0 ? NumberFormat.getIntegerInstance().format($F{asset_groups}) + " asset groups\n" : "") + 
+($F{tags} > 0.0 ? NumberFormat.getIntegerInstance().format($F{tags}) + " tags" : "")]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="523" height="18" forecolor="#999999" backcolor="#FFFFFF" uuid="d2aec3c2-8a2c-4cab-ace8-535f3df5f733"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scope]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

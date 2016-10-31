@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-25T11:41:46 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="assessment-status-pie-medium" pageWidth="174" pageHeight="174" columnWidth="174" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5969dff1-afee-44d4-96f3-3599083d86b7">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="WHERE_FILTER" class="java.lang.String">
+		<parameterDescription><![CDATA[WHERE clause that can filter assets.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["WHERE true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH
+    assessed AS (
+    	   SELECT SUM(CASE WHEN assessed_for_vulnerabilities THEN 1 ELSE 0 END) AS assessed, COUNT(DISTINCT asset_id) AS total
+    	   FROM dim_asset
+    	   $P!{WHERE_FILTER} 
+    	)
+SELECT assessed, total - assessed AS unassessed, total
+FROM assessed]]>
+	</queryString>
+	<field name="assessed" class="java.lang.Long"/>
+	<field name="unassessed" class="java.lang.Long"/>
+	<field name="total" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="174" splitType="Stretch">
+			<pieChart>
+				<chart isShowLegend="true" evaluationTime="Report">
+					<reportElement x="0" y="0" width="174" height="174" uuid="0abfc5cd-888e-42f7-b82c-57b620214670">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend position="Bottom">
+						<font size="10"/>
+					</chartLegend>
+				</chart>
+				<pieDataset minPercentage="0.5">
+					<pieSeries>
+						<keyExpression><![CDATA["Assessed"]]></keyExpression>
+						<valueExpression><![CDATA[$F{assessed}]]></valueExpression>
+						<labelExpression><![CDATA[(($F{assessed}.doubleValue() / $F{total}) <= .01) ? new DecimalFormat("#.0%").format($F{assessed}.doubleValue() / $F{total}) : new DecimalFormat("#0%").format($F{assessed}.doubleValue() / $F{total})]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Discovered"]]></keyExpression>
+						<valueExpression><![CDATA[$F{unassessed}]]></valueExpression>
+						<labelExpression><![CDATA[(($F{unassessed}.doubleValue() / $F{total}) <= 1.0) ? new DecimalFormat("#.0%").format($F{unassessed}.doubleValue() / $F{total}) : new DecimalFormat("##%").format($F{unassessed}.doubleValue() / $F{total})]]></labelExpression>
+					</pieSeries>
+				</pieDataset>
+				<piePlot isShowLabels="true" isCircular="true" labelFormat="">
+					<plot orientation="Horizontal"/>
+					<itemLabel>
+						<font size="8"/>
+					</itemLabel>
+				</piePlot>
+			</pieChart>
+		</band>
+	</summary>
+</jasperReport>

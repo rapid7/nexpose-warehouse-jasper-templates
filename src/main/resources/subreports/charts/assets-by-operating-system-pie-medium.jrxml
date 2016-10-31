@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-10-31T15:21:21 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="assets-by-operating-system-pie-medium" pageWidth="260" pageHeight="180" columnWidth="260" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5969dff1-afee-44d4-96f3-3599083d86b7">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[WHERE clause that can filter assets.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH
+   groups AS (
+      SELECT COALESCE(os_system, 'Unknown') AS os_system, COUNT(DISTINCT asset_id) AS assets
+      FROM dim_asset
+      WHERE $P!{WHERE_FILTER_ASSET}
+      GROUP BY os_system
+   ),
+   limited_groups AS (
+      SELECT *
+      FROM groups
+      ORDER BY assets DESC
+      LIMIT 8
+   ),
+   other_group AS (
+      SELECT 'Other'::TEXT AS os_system, COALESCE(SUM(assets), 0) AS assets
+      FROM groups
+      WHERE os_system NOT IN (SELECT os_system FROM limited_groups)
+   )
+ SELECT os_system, assets, (SELECT SUM(assets) FROM groups) AS total_assets
+ FROM (
+ 	SELECT *
+ 	FROM limited_groups
+ 	WHERE assets > 0 AND (assets / (SELECT SUM(assets) FROM groups)) > .01
+ 	UNION
+ 	SELECT *
+ 	FROM other_group
+ 	WHERE assets > 0
+ ) g
+ ORDER BY assets DESC]]>
+	</queryString>
+	<field name="os_system" class="java.lang.String"/>
+	<field name="assets" class="java.math.BigDecimal"/>
+	<field name="total_assets" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="180" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<pieChart>
+				<chart isShowLegend="false" evaluationTime="Report">
+					<reportElement x="0" y="0" width="260" height="180" uuid="72ba1cd6-1413-45b8-874d-962401a7073d">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend position="Right">
+						<font size="8"/>
+					</chartLegend>
+				</chart>
+				<pieDataset maxCount="6" minPercentage="1.0">
+					<keyExpression><![CDATA[$F{os_system}]]></keyExpression>
+					<valueExpression><![CDATA[$F{assets}]]></valueExpression>
+					<labelExpression><![CDATA[$F{os_system}]]></labelExpression>
+					<otherKeyExpression><![CDATA[]]></otherKeyExpression>
+				</pieDataset>
+				<piePlot isShowLabels="true" isCircular="true" labelFormat=" ">
+					<plot orientation="Horizontal">
+						<seriesColor seriesOrder="0" color="#FFCCFF"/>
+						<seriesColor seriesOrder="1" color="#FFCCCC"/>
+						<seriesColor seriesOrder="2" color="#FFCC99"/>
+						<seriesColor seriesOrder="3" color="#CCCCCC"/>
+						<seriesColor seriesOrder="4" color="#CCCC99"/>
+						<seriesColor seriesOrder="5" color="#CCFFFF"/>
+						<seriesColor seriesOrder="6" color="#99FFCC"/>
+						<seriesColor seriesOrder="7" color="#CCFF99"/>
+						<seriesColor seriesOrder="8" color="#FF33CC"/>
+					</plot>
+					<itemLabel>
+						<font size="7"/>
+					</itemLabel>
+				</piePlot>
+			</pieChart>
+		</band>
+	</summary>
+</jasperReport>
