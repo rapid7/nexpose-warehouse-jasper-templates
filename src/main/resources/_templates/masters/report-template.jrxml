@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T15:16:35 -->
+<!-- 2016-11-02T16:22:53 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CHANGE-ME" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
@@ -56,6 +56,14 @@
 		<parameterDescription><![CDATA[The names of tags to filter.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
 	</parameter>
+	<parameter name="ORDER_BY" class="java.lang.String">
+		<parameterDescription><![CDATA[ORDER BY clause to sort results.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["assets_changed ASC"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LIMIT" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of vulnerabilities to display.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[Integer.MAX_VALUE]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT 1;]]>
 	</queryString>
@@ -76,6 +84,9 @@
 				<subreportParameter name="TITLE">
 					<subreportParameterExpression><![CDATA["CHANGE ME"]]></subreportParameterExpression>
 				</subreportParameter>
+				<subreportParameter name="SUB_TITLE">
+					<subreportParameterExpression><![CDATA["CHANGE ME"]]></subreportParameterExpression>
+				</subreportParameter>
 				<subreportParameter name="REPORT_NAME">
 					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -92,12 +103,51 @@
 					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/title" + ($P{TITLE_PAGE} ? "-page" : "") + ".jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/_appendices/title" + ($P{TITLE_PAGE} ? "-page" : "") + ".jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</title>
 	<detail>
-		<band height="104"/>
+		<band height="107">
+			<subreport>
+				<reportElement x="0" y="0" width="523" height="107" uuid="5479b6ea-5073-4740-b26c-dc1293645b80"/>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET} + 
+($P{SITE_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
+"   SELECT asset_id " +
+"   FROM dim_site_asset " +
+"      JOIN dim_site USING (site_id) " +
+"   WHERE name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
+")") +
+($P{ASSET_GROUP_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
+"   SELECT asset_id " +
+"   FROM dim_asset_group_asset " +
+"      JOIN dim_asset_group USING (asset_group_id) " +
+"   WHERE name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
+")")+
+($P{TAG_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
+"   SELECT asset_id " +
+"   FROM dim_tag_asset " +
+"      JOIN dim_tag USING (tag_id) " +
+"   WHERE name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
+")")]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_VULNERABILITY">
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_VULNERABILITY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ORDER_BY">
+					<subreportParameterExpression><![CDATA[$P{ORDER_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/CHANGE-ME.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
 	</detail>
 	<pageFooter>
 		<band height="23">

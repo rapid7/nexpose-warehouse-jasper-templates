@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T15:32:23 -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="top-riskiest-assets" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
-	<property name="ireport.zoom" value="1.1269722013523715"/>
+<!-- 2016-11-02T20:24:16 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="top-vulnerable-assets" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="288"/>
 	<property name="ireport.layers" value="##Fri Aug 31 13:09:25 PDT 2012\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
@@ -34,9 +34,17 @@
 		<parameterDescription><![CDATA[Whether to show a chart in the title area.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
 	</parameter>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[Clause that can filter assets (asset_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="FIELD" class="java.lang.String">
+		<parameterDescription><![CDATA[The field ot rank assets by]]></parameterDescription>
+		<defaultValueExpression><![CDATA["risk_score"]]></defaultValueExpression>
+	</parameter>
 	<parameter name="LIMIT" class="java.lang.Integer">
 		<parameterDescription><![CDATA[The number of assets to include in the prioritization.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[20]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[15]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT 1;]]>
@@ -47,65 +55,55 @@
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
 	<title>
-		<band height="60" splitType="Stretch">
+		<band height="45" splitType="Stretch">
 			<subreport>
-				<reportElement positionType="Float" x="0" y="0" width="523" height="45" uuid="14dd2bce-971d-4bee-ab26-bf3395a0c96d">
+				<reportElement positionType="Float" x="0" y="0" width="523" height="45" uuid="2ae90c3a-d390-470c-8819-62551a9c98b2">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<subreportParameter name="REPORT_NAME">
-					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="COUNT">
-					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
-				</subreportParameter>
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="TITLE">
-					<subreportParameterExpression><![CDATA[msg("Top {0} Assets by Vulnerability Risk", $P{LIMIT})]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[msg("Top {0} Assets by {1}", $P{LIMIT}, 
+$P{FIELD}.equalsIgnoreCase("risk_score") ? "Risk Score" : 
+$P{FIELD}.equalsIgnoreCase("vulnerabilities") ? "Vulnerabilities" :
+$P{FIELD}.equalsIgnoreCase("malware_kits") ? "Malware Kits" :
+$P{FIELD}.equalsIgnoreCase("exploits") ? "Exploits" :
+$P{FIELD}.equalsIgnoreCase("critical_vulnerabilities") ? "Critical Vulnerabilities" :
+$P{FIELD}.equalsIgnoreCase("severe_vulnerabilities") ? "Severe Vulnerabilities" :
+$P{FIELD}.equalsIgnoreCase("moderate_vulnerabilities") ? "Moderate Vulnerabilities" :
+$P{FIELD}.equalsIgnoreCase("vulnerabilities_with_malware_kit") ? "Vulnerabilities with Malware Kit" :
+$P{FIELD}.equalsIgnoreCase("vulnerabilities_with_exploit") ? "Vulnerabilities with Exploit" : "Vulnerabilities"
+)]]></subreportParameterExpression>
 				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/title" + ($P{TITLE_PAGE} ? "-page" : "") + ".jasper"]]></subreportExpression>
-			</subreport>
-			<subreport>
-				<reportElement positionType="Float" x="0" y="45" width="523" height="15" uuid="44e36e57-0cd2-4065-b0e6-df9e826bf5ef">
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-					<printWhenExpression><![CDATA[$P{SHOW_CHART}]]></printWhenExpression>
-				</reportElement>
 				<subreportParameter name="REPORT_NAME">
 					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="LIMIT">
-					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="BASE_DIR">
-					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="TITLE">
-					<subreportParameterExpression><![CDATA[msg("Top {0} Assets by Vulnerability Risk", $P{LIMIT})]]></subreportParameterExpression>
-				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/charts/riskiest-assets-bar-large.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/_appendices/title" + ($P{TITLE_PAGE} ? "-page" : "") + ".jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</title>
 	<detail>
-		<band height="70">
+		<band height="115">
 			<subreport>
-				<reportElement positionType="Float" x="0" y="0" width="523" height="70" uuid="cc22abeb-1cf5-483c-9bfc-0b840a659113">
+				<reportElement positionType="Float" x="0" y="0" width="523" height="115" uuid="418448b7-f55a-4a0f-871a-372733317fc7">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<subreportParameter name="LIMIT">
-					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
-				</subreportParameter>
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
+				<subreportParameter name="SHOW_CHART">
+					<subreportParameterExpression><![CDATA[$P{SHOW_CHART}]]></subreportParameterExpression>
+				</subreportParameter>
 				<subreportParameter name="WHERE_FILTER_ASSET">
-					<subreportParameterExpression><![CDATA["risk_score > 0"]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="ORDER_BY">
-					<subreportParameterExpression><![CDATA["risk_score DESC"]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{FIELD} + " DESC"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/assets/asset-listing.jasper"]]></subreportExpression>
@@ -113,13 +111,14 @@
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="25" splitType="Stretch">
+		<band height="22" splitType="Stretch">
 			<textField evaluationTime="Auto">
-				<reportElement x="471" y="3" width="52" height="20" uuid="c5e382a2-904a-4bc3-b360-064524ef74ce">
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<reportElement x="370" y="0" width="153" height="20" forecolor="#333333" uuid="1bf28666-eb1f-4627-bef9-f5cd5fd7a93c">
 					<printWhenExpression><![CDATA[!$P{TITLE_PAGE} || ($P{TITLE_PAGE} && $V{CURRENT_PAGE_NUMBER} > 1.0)]]></printWhenExpression>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
 				<textFieldExpression><![CDATA[msg("{0} of {1}", $V{CURRENT_PAGE_NUMBER}, $V{PAGE_NUMBER})]]></textFieldExpression>
 			</textField>
 		</band>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-11-02T16:19:52 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="period-interval" pageWidth="100" pageHeight="1" whenNoDataType="NoDataSection" columnWidth="100" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="112"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<import value="java.time.format.*"/>
+	<import value="java.time.*"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="INPUT_START" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[LocalDate.now().minusDays(90).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></defaultValueExpression>
+	</parameter>
+	<parameter name="INPUT_END" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<variable name="OUTPUT_START" class="java.time.LocalDate" resetType="None">
+		<initialValueExpression><![CDATA[java.time.LocalDate.parse($P{INPUT_START}, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></initialValueExpression>
+	</variable>
+	<variable name="OUTPUT_END" class="java.time.LocalDate" resetType="None">
+		<initialValueExpression><![CDATA[java.time.LocalDate.parse($P{INPUT_END}, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></initialValueExpression>
+	</variable>
+	<detail>
+		<band height="1">
+			<subreport>
+				<reportElement x="0" y="0" width="30" height="1" uuid="7a7cc6fa-becc-487b-b7d8-cafb1e69d8a7">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="INPUT_PERIOD">
+					<subreportParameterExpression><![CDATA[$P{INPUT_START}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="OUTPUT_PERIOD" toVariable="OUTPUT_START"/>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/_functions/period-after.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="60" y="0" width="30" height="1" uuid="07c096a4-8ace-4f60-9a82-f045ff915bcf"/>
+				<subreportParameter name="INPUT_PERIOD">
+					<subreportParameterExpression><![CDATA[$P{INPUT_END}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="OUTPUT_PERIOD" toVariable="OUTPUT_END"/>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/_functions/period-before.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

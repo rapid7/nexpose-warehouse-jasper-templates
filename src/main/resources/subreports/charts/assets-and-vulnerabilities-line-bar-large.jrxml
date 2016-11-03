@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T13:44:46 -->
+<!-- 2016-11-01T13:19:50 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="assets-and-vulnerabilities-line-bar-large" pageWidth="523" pageHeight="400" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="264a987a-9c3b-46a7-9ab8-56b86d279c0f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -34,43 +34,28 @@
 	</parameter>
 	<queryString>
 		<![CDATA[WITH
-   dates AS (
-      SELECT row_number() over () AS row, CAST(generate_series AS date) AS day
-      FROM generate_series('$P!{TREND_END_DATE}',  '$P!{TREND_START_DATE}', -(INTERVAL '$P!{TREND_INTERVAL}'))
-   ),
-   date_ranges AS (
-      SELECT CASE WHEN row = (SELECT MAX(row) FROM dates) THEN '$P!{TREND_START_DATE}' ELSE (((day) - INTERVAL '$P!{TREND_INTERVAL}') + INTERVAL '1 day')::DATE END AS start, day AS end
-      FROM dates
-   ),
    filtered_vulnerabilities AS (
       SELECT day, asset_id, COUNT(DISTINCT vulnerability_id) AS vulnerabilities
       FROM fact_asset_vulnerability_finding_date
       WHERE $P!{WHERE_FILTER_ASSET} AND $P!{WHERE_FILTER_VULNERABILITY} AND day <= '$P!{TREND_END_DATE}' AND day >= '$P!{TREND_START_DATE}'
       GROUP BY day, asset_id
    ),
-   assets_by_date_range AS (
-      SELECT DISTINCT ON (asset_id, dr.end) asset_id, dr.end AS day, vulnerabilities
-      FROM filtered_vulnerabilities fv
-         CROSS JOIN date_ranges dr
-      WHERE fv.day <= dr.end AND fv.day >= dr.start
-      ORDER BY asset_id, dr.end, fv.day DESC
-   ),
    date_series AS (
       SELECT day, COUNT(DISTINCT asset_id) AS assets, COALESCE(SUM(vulnerabilities), 0)::BIGINT AS vulnerabilities
-      FROM assets_by_date_range
+      FROM filtered_vulnerabilities
       GROUP BY day
    ),
    end_summary AS (
       SELECT vulnerabilities AS end_vulnerabilities, assets AS end_assets
-      FROM date_series 
-         RIGHT OUTER JOIN dates USING (day)
+      FROM date_series
+         RIGHT OUTER JOIN periods USING (day)
       ORDER BY day DESC
       LIMIT 1
    ),
    start_summary AS (
       SELECT vulnerabilities AS start_vulnerabilities, assets AS start_assets
-      FROM date_series 
-         RIGHT OUTER JOIN dates USING (day)
+      FROM date_series
+         RIGHT OUTER JOIN periods USING (day)
       ORDER BY day ASC
       LIMIT 1
    )
@@ -80,7 +65,7 @@ SELECT day, COALESCE(assets, 0) AS assets, COALESCE(vulnerabilities, 0) AS vulne
 FROM date_series
    CROSS JOIN end_summary
    CROSS JOIN start_summary
-   RIGHT OUTER JOIN dates USING (day)
+   RIGHT OUTER JOIN periods USING (day)
 ORDER BY day ASC]]>
 	</queryString>
 	<field name="day" class="java.sql.Date"/>

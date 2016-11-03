@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-11-02T16:17:47 -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="prioritized-remediations-with-trend" pageWidth="595" pageHeight="842" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" uuid="6919498d-6c83-4778-ac2b-9318691f835b">
-	<property name="ireport.zoom" value="1.0"/>
+<!-- 2016-11-02T16:19:24 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CHANGE-ME" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="242"/>
-	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="ireport.y" value="112"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="322"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="671"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
 	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
 		<parameterDescription><![CDATA[]]></parameterDescription>
 		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
 	</parameter>
 	<parameter name="REPORT_NAME" class="java.lang.String">
-		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		<parameterDescription><![CDATA[The name of the report being generated.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
 	<parameter name="TITLE_PAGE" class="java.lang.Boolean">
 		<parameterDescription><![CDATA[Whether to show a title page instead of a title-header.]]></parameterDescription>
@@ -23,89 +36,73 @@
 		<parameterDescription><![CDATA[Whether to show the scope appendix after the content of the report.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SHOW_REMEDIATION_DETAILS" class="java.lang.Boolean">
-		<parameterDescription><![CDATA[Whether to show the details and affected assets for each selected solution.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	<parameter name="START_DATE" class="java.lang.String">
+		<parameterDescription><![CDATA[The start date of the trending for the report (YYYY-MM-DD).]]></parameterDescription>
+		<defaultValueExpression><![CDATA[java.time.LocalDate.now().minusDays(90).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SHOW_SUMMARY_HEADER" class="java.lang.Boolean">
-		<parameterDescription><![CDATA[Whether to show the summary header for the selected remediations.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
-	</parameter>
-	<parameter name="TREND_START_DATE" class="java.util.Date">
-		<parameterDescription><![CDATA[The start date of the trending for the report.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[org.apache.commons.lang.time.DateUtils.addDays(new Date(), -90)]]></defaultValueExpression>
-	</parameter>
-	<parameter name="TREND_END_DATE" class="java.util.Date">
-		<parameterDescription><![CDATA[The end date for the trending of the report.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[new Date()]]></defaultValueExpression>
-	</parameter>
-	<parameter name="TREND_INTERVAL" class="java.lang.String">
-		<parameterDescription><![CDATA[The interval in data points for the trend.]]></parameterDescription>
-		<defaultValueExpression><![CDATA["7 Days"]]></defaultValueExpression>
-	</parameter>
-	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
-		<parameterDescription><![CDATA[Clause that can filter assets (asset_id).]]></parameterDescription>
-		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	<parameter name="END_DATE" class="java.lang.String">
+		<parameterDescription><![CDATA[The end date for the trending of the report (YYYY-MM-DD).]]></parameterDescription>
+		<defaultValueExpression><![CDATA[java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></defaultValueExpression>
 	</parameter>
 	<parameter name="WHERE_FILTER_VULNERABILITY" class="java.lang.String">
 		<parameterDescription><![CDATA[Clause that can filter vulnerabilities (vulnerability_id).]]></parameterDescription>
 		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="TAG_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
-		<parameterDescription><![CDATA[The names of tags to filter.]]></parameterDescription>
+	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
+		<parameterDescription><![CDATA[Clause that can filter assets (asset_id).]]></parameterDescription>
+		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SITE_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of sites to filter.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
 	</parameter>
 	<parameter name="ASSET_GROUP_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
 		<parameterDescription><![CDATA[The names of asset groups to filter.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
 	</parameter>
-	<parameter name="SITE_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
-		<parameterDescription><![CDATA[The names of sites to filter.]]></parameterDescription>
+	<parameter name="TAG_NAMES" class="java.util.ArrayList" nestedType="java.lang.String">
+		<parameterDescription><![CDATA[The names of tags to filter.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[new ArrayList()]]></defaultValueExpression>
 	</parameter>
 	<parameter name="ORDER_BY" class="java.lang.String">
-		<parameterDescription><![CDATA[ORDER BY clause to sort solutions by remediation impact.]]></parameterDescription>
-		<defaultValueExpression><![CDATA["risk_score DESC"]]></defaultValueExpression>
+		<parameterDescription><![CDATA[ORDER BY clause to sort results.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["assets_changed ASC"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="LIMIT" class="java.lang.Integer">
-		<parameterDescription><![CDATA[The number of solutions to prioritize.]]></parameterDescription>
-		<defaultValueExpression><![CDATA[25]]></defaultValueExpression>
+		<parameterDescription><![CDATA[The number of vulnerabilities to display.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[Integer.MAX_VALUE]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT 1]]>
+		<![CDATA[SELECT 1;]]>
 	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
 	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
 		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
+	<variable name="START_DATE" class="java.time.LocalDate" resetType="None">
+		<initialValueExpression><![CDATA[java.time.LocalDate.parse($P{START_DATE}, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></initialValueExpression>
+	</variable>
+	<variable name="END_DATE" class="java.time.LocalDate" resetType="None">
+		<initialValueExpression><![CDATA[java.time.LocalDate.parse($P{END_DATE}, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))]]></initialValueExpression>
+	</variable>
 	<title>
-		<band height="45" splitType="Stretch">
-			<elementGroup>
-				<elementGroup/>
-			</elementGroup>
+		<band height="45">
 			<subreport>
-				<reportElement positionType="Float" x="0" y="0" width="523" height="45" uuid="e8703101-b5a6-466f-976b-6089f37cdd12">
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<reportElement key="" x="0" y="0" width="523" height="45" uuid="d9386716-5aa8-43bd-b613-32328cc3dc89">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
-				<subreportParameter name="REPORT_NAME">
-					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="SORT_BY">
-					<subreportParameterExpression><![CDATA[$P{ORDER_BY}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="NUMBER_OF_SOLUTIONS">
-					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="TITLE">
-					<subreportParameterExpression><![CDATA[msg("Vulnerability Trends & Top {0} Remediations by {1}", $P{LIMIT}, 
-$P{ORDER_BY}.contains("risk_score") ? "Risk" : $P{ORDER_BY}.contains("assets") ? "Affected Assets" : $P{ORDER_BY}.contains("vulnerabilities") ? "Vulnerabilities" : $P{ORDER_BY}.contains("exploits") ? "Exploit Exposures" : $P{ORDER_BY}.contains("malware_kits") ? "Malware Exposures" : "")]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="SUB_TITLE">
-					<subreportParameterExpression><![CDATA[msg("Trend period: {0} to {1}", DateFormat.getDateInstance(DateFormat.LONG, $P{REPORT_LOCALE}).format($P{TREND_START_DATE}), DateFormat.getDateInstance(DateFormat.LONG, $P{REPORT_LOCALE}).format($P{TREND_END_DATE}))]]></subreportParameterExpression>
-				</subreportParameter>
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TITLE">
+					<subreportParameterExpression><![CDATA["Vulnerability Comparison"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUB_TITLE">
+					<subreportParameterExpression><![CDATA["Trend period: " + $P{START_DATE} + " to " + $P{END_DATE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="WHERE_FILTER_SITE">
 					<subreportParameterExpression><![CDATA[$P{SITE_NAMES}.isEmpty() ? "false" : "name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'")]]></subreportParameterExpression>
@@ -125,66 +122,34 @@ $P{ORDER_BY}.contains("risk_score") ? "Risk" : $P{ORDER_BY}.contains("assets") ?
 		</band>
 	</title>
 	<detail>
-		<band height="204">
+		<band height="1">
 			<subreport>
-				<reportElement x="0" y="0" width="523" height="120" uuid="464b2446-d937-4dc9-8b72-587b5af005b2">
+				<reportElement x="0" y="0" width="523" height="1" uuid="7315f54e-e729-4ae3-b961-44a0e51953b5">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<subreportParameter name="BASE_DIR">
-					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				<subreportParameter name="INPUT_START">
+					<subreportParameterExpression><![CDATA[$P{START_DATE}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="REPORT_NAME">
-					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="TREND_START_DATE">
-					<subreportParameterExpression><![CDATA[$P{TREND_START_DATE}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="TREND_END_DATE">
-					<subreportParameterExpression><![CDATA[$P{TREND_END_DATE}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="TREND_INTERVAL">
-					<subreportParameterExpression><![CDATA[$P{TREND_INTERVAL}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="WHERE_FILTER_ASSET">
-					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET} + 
-($P{SITE_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
-"   SELECT asset_id " +
-"   FROM dim_site_asset " +
-"      JOIN dim_site USING (site_id) " +
-"   WHERE name IN " + $P{SITE_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
-")") +
-($P{ASSET_GROUP_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
-"   SELECT asset_id " +
-"   FROM dim_asset_group_asset " +
-"      JOIN dim_asset_group USING (asset_group_id) " +
-"   WHERE name IN " + $P{ASSET_GROUP_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
-")")+
-($P{TAG_NAMES}.isEmpty() ? "" : " AND asset_id IN (" +
-"   SELECT asset_id " +
-"   FROM dim_tag_asset " +
-"      JOIN dim_tag USING (tag_id) " +
-"   WHERE name IN " + $P{TAG_NAMES}.toString().replaceAll("\\[", "\\(").replaceAll("\\]", "\\)").replaceAll("\"", "'") + 
-")")]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="WHERE_FILTER_VULNERABILITY">
-					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_VULNERABILITY}]]></subreportParameterExpression>
+				<subreportParameter name="INPUT_END">
+					<subreportParameterExpression><![CDATA[$P{END_DATE}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/charts/assets-and-vulnerabilities-line-bar-large.jasper"]]></subreportExpression>
+				<returnValue subreportVariable="OUTPUT_START" toVariable="START_DATE"/>
+				<returnValue subreportVariable="OUTPUT_END" toVariable="END_DATE"/>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/_functions/period-interval.jasper"]]></subreportExpression>
 			</subreport>
+		</band>
+		<band height="150">
 			<subreport>
-				<reportElement positionType="Float" x="1" y="120" width="522" height="84" uuid="ec1b696c-7fe3-488a-a466-4d2468fe1ae0"/>
+				<reportElement x="0" y="0" width="523" height="150" uuid="dea98520-c00a-4810-bc25-3f4ba3c2b7cc"/>
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="REPORT_NAME">
-					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
+				<subreportParameter name="START_DATE">
+					<subreportParameterExpression><![CDATA[$V{START_DATE}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="SHOW_SUMMARY_HEADER">
-					<subreportParameterExpression><![CDATA[$P{SHOW_SUMMARY_HEADER}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="SHOW_REMEDIATION_DETAILS">
-					<subreportParameterExpression><![CDATA[$P{SHOW_REMEDIATION_DETAILS}]]></subreportParameterExpression>
+				<subreportParameter name="END_DATE">
+					<subreportParameterExpression><![CDATA[$V{END_DATE}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="WHERE_FILTER_ASSET">
 					<subreportParameterExpression><![CDATA[$P{WHERE_FILTER_ASSET} + 
@@ -217,19 +182,18 @@ $P{ORDER_BY}.contains("risk_score") ? "Risk" : $P{ORDER_BY}.contains("assets") ?
 					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/remediation/remediation-listing.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/CHANGE-ME.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="20" splitType="Stretch">
+		<band height="23">
 			<textField evaluationTime="Auto">
-				<reportElement x="470" y="0" width="53" height="20" forecolor="#333333" uuid="f8343cc9-8704-487a-b5fb-07655679c5ed">
+				<reportElement x="370" y="3" width="153" height="20" uuid="92493412-dec6-4b15-8549-180a6956878d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<printWhenExpression><![CDATA[!$P{TITLE_PAGE} || ($P{TITLE_PAGE} && $V{CURRENT_PAGE_NUMBER} > 1.0)]]></printWhenExpression>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="11"/>
-				</textElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[msg("{0} of {1}", $V{CURRENT_PAGE_NUMBER}, $V{PAGE_NUMBER})]]></textFieldExpression>
 			</textField>
 		</band>
@@ -237,12 +201,12 @@ $P{ORDER_BY}.contains("risk_score") ? "Risk" : $P{ORDER_BY}.contains("assets") ?
 	<summary>
 		<band height="30">
 			<break>
-				<reportElement x="0" y="0" width="99" height="1" uuid="9f41dd48-c735-4b0b-9f69-a049dd6a0473">
+				<reportElement x="0" y="0" width="99" height="1" uuid="316b9e79-d3bc-43cd-83a9-616c937c0c0b">
 					<printWhenExpression><![CDATA[$P{SCOPE_APPENDIX}]]></printWhenExpression>
 				</reportElement>
 			</break>
 			<subreport>
-				<reportElement positionType="Float" x="0" y="1" width="523" height="29" uuid="5ea16169-3d8b-454a-9cc8-42e440591556">
+				<reportElement positionType="Float" x="0" y="1" width="523" height="29" uuid="94f77866-2c81-4b0c-8bc1-83ad35a7fdd5">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<printWhenExpression><![CDATA[$P{SCOPE_APPENDIX}]]></printWhenExpression>

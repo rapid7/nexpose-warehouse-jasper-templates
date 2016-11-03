@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T11:12:16 -->
+<!-- 2016-11-02T20:21:09 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="asset-listing" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.1269722013523715"/>
 	<property name="ireport.x" value="0"/>
@@ -31,6 +31,13 @@
 		<parameterDescription><![CDATA[]]></parameterDescription>
 		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
 	</parameter>
+	<parameter name="NO_DATA_MESSAGE" class="java.lang.String">
+		<parameterDescription><![CDATA[Message to display when no assets match the specified filter.]]></parameterDescription>
+	</parameter>
+	<parameter name="SHOW_CHART" class="java.lang.Boolean">
+		<parameterDescription><![CDATA[Whether to display a summary chart before the listing.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	</parameter>
 	<parameter name="WHERE_FILTER_ASSET" class="java.lang.String">
 		<parameterDescription><![CDATA[Clause to filter assets (asset_id).]]></parameterDescription>
 		<defaultValueExpression><![CDATA["true"]]></defaultValueExpression>
@@ -43,14 +50,13 @@
 		<parameterDescription><![CDATA[The number of assets to include in the listing.]]></parameterDescription>
 		<defaultValueExpression><![CDATA[Integer.MAX_VALUE]]></defaultValueExpression>
 	</parameter>
-	<parameter name="NO_DATA_MESSAGE" class="java.lang.String">
-		<parameterDescription><![CDATA[Message to display when no assets match the specified filter.]]></parameterDescription>
-	</parameter>
 	<queryString>
 		<![CDATA[SELECT asset_id, COALESCE(host_name, HOST(ip_address)) AS name,
-   risk_score, vulnerabilities, malware_kits, exploits
-FROM fact_asset fa
-   JOIN dim_asset da USING (asset_id)
+   risk_score, vulnerabilities, malware_kits, exploits, critical_vulnerabilities,
+   severe_vulnerabilities, moderate_vulnerabilities, vulnerabilities_with_malware_kit,
+   vulnerabilities_with_exploit
+FROM fact_asset
+   JOIN dim_asset USING (asset_id)
 WHERE $P!{WHERE_FILTER_ASSET} 
 ORDER BY $P!{ORDER_BY} 
 LIMIT $P{LIMIT}]]>
@@ -61,10 +67,77 @@ LIMIT $P{LIMIT}]]>
 	<field name="vulnerabilities" class="java.lang.Long"/>
 	<field name="malware_kits" class="java.lang.Integer"/>
 	<field name="exploits" class="java.lang.Integer"/>
+	<field name="critical_vulnerabilities" class="java.lang.Long"/>
+	<field name="severe_vulnerabilities" class="java.lang.Long"/>
+	<field name="moderate_vulnerabilities" class="java.lang.Long"/>
+	<field name="vulnerabilities_with_malware_kit" class="java.lang.Integer"/>
+	<field name="vulnerabilities_with_exploit" class="java.lang.Integer"/>
 	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
 		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
+	<title>
+		<band height="405">
+			<printWhenExpression><![CDATA[$P{SHOW_CHART}]]></printWhenExpression>
+			<multiAxisChart>
+				<chart isShowLegend="false" evaluationTime="Report">
+					<reportElement x="0" y="0" width="520" height="400" uuid="190583a2-d6b2-4b7d-9962-e6576d2a7be8"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<multiAxisPlot>
+					<plot orientation="Horizontal"/>
+					<axis position="rightOrBottom">
+						<barChart>
+							<chart isShowLegend="false" evaluationTime="Report">
+								<reportElement x="0" y="0" width="0" height="0" backcolor="#FFFFFF" uuid="b7f18f05-e839-446d-8da8-7aad279633e7"/>
+								<chartTitle color="#000000"/>
+								<chartSubtitle color="#000000"/>
+								<chartLegend textColor="#000000" backgroundColor="#FFFFFF"/>
+							</chart>
+							<categoryDataset>
+								<categorySeries>
+									<seriesExpression><![CDATA["Series"]]></seriesExpression>
+									<categoryExpression><![CDATA[$F{name}]]></categoryExpression>
+									<valueExpression><![CDATA[$P{ORDER_BY}.contains("risk_score") ? $F{risk_score} : 
+$P{ORDER_BY}.contains("malware_kits") ? $F{malware_kits} :
+$P{ORDER_BY}.contains("exploits") ? $F{exploits} :
+$P{ORDER_BY}.contains("critical_vulnerabilities") ? $F{critical_vulnerabilities} :
+$P{ORDER_BY}.contains("severe_vulnerabilities") ? $F{severe_vulnerabilities} :
+$P{ORDER_BY}.contains("moderate_vulnerabilities") ? $F{moderate_vulnerabilities} :
+$P{ORDER_BY}.contains("vulnerabilities_with_malware_kit") ? $F{vulnerabilities_with_malware_kit} :
+$P{ORDER_BY}.contains("vulnerabilities_with_exploit") ? $F{vulnerabilities_with_exploit} : 
+$P{ORDER_BY}.contains("vulnerabilities") ? $F{vulnerabilities} : $F{vulnerabilities}]]></valueExpression>
+								</categorySeries>
+							</categoryDataset>
+							<barPlot isShowLabels="false">
+								<plot orientation="Horizontal">
+									<seriesColor seriesOrder="0" color="#0099FF"/>
+								</plot>
+								<itemLabel>
+									<font size="8"/>
+								</itemLabel>
+								<categoryAxisFormat>
+									<axisFormat/>
+								</categoryAxisFormat>
+								<valueAxisFormat>
+									<axisFormat>
+										<labelFont>
+											<font size="8"/>
+										</labelFont>
+										<tickLabelFont>
+											<font size="8"/>
+										</tickLabelFont>
+									</axisFormat>
+								</valueAxisFormat>
+							</barPlot>
+						</barChart>
+					</axis>
+				</multiAxisPlot>
+			</multiAxisChart>
+		</band>
+	</title>
 	<columnHeader>
 		<band height="20" splitType="Stretch">
 			<rectangle>
@@ -154,7 +227,7 @@ LIMIT $P{LIMIT}]]>
 				<reportElement mode="Opaque" x="408" y="5" width="12" height="12" backcolor="#F0F0F0" uuid="4b10703d-1fb8-46d7-9b9a-85b720cf3815">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-					<printWhenExpression><![CDATA[$P{ORDER_BY}.contains("vulnerabilities")]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{ORDER_BY}.contains("vulnerabilities ASC") || $P{ORDER_BY}.contains("vulnerabilities DESC")]]></printWhenExpression>
 				</reportElement>
 				<imageExpression><![CDATA[$P{BASE_DIR} + "/images/sort-" + ($P{ORDER_BY}.contains("vulnerabilities DESC") ?  "down" : "up") + ".png"]]></imageExpression>
 			</image>
