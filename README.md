@@ -3,11 +3,12 @@
 Nexpose Warehouse Jasper Templates is a set of report templates designed for use against a dimensional data warehouse populated by the Nexpose Data Warehouse feature. Once Nexpose exports data through a periodic ETL process into the warehouse it is available for consumption using any Business Intelligence tool. This project caters to those that select [TIBCO Jaspersoft® Studio](http://community.jaspersoft.com/project/jaspersoft-studio). Refer to the [Jaspersoft Community](http://community.jaspersoft.com/documentation) for more documentation.
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-orange.svg)](License)
+[![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html)
 
 ## Compatibility
 
-* [Nexpose](https://www.rapid7.com/products/nexpose/) v6.4.6+
-* [TIBCO Jaspersoft® Studio](http://community.jaspersoft.com/project/jaspersoft-studio) v3.6+ (community edition)
+[![Jaspersoft Studio](https://img.shields.io/badge/TIBCO%20Jaspersoft®%20Studio%20Studio-3.6%2B-green.svg)]()
+[![Nexpose](https://img.shields.io/badge/Nexpose-6.4.6%2B-green.svg)]()
 
 ## Installation
 
