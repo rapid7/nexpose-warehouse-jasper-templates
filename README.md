@@ -136,7 +136,3 @@ No official public releases are performed on this project, as the source files a
 Contributions are welcomed in this project. Ensure you develop according to the conventions outlined above. To contribute, fork this repository and open a pull-request.
 
 This project uses [Semantic Versioning](http://semver.org/).
-
-## License
-
-The project is provided under the 3-Clause BSD License. See [license](license.txt) for details.
