@@ -6,7 +6,7 @@ Nexpose Warehouse Jasper Templates is a set of report templates designed for use
 
 ## Compatibility
 
-[![Jaspersoft Studio](https://img.shields.io/badge/TIBCO%20Jaspersoft®%20Studio%20Studio-3.6%2B-green.svg)]()
+[![Jaspersoft Studio](https://img.shields.io/badge/TIBCO%20Jaspersoft®%20Studio-3.6%2B-green.svg)]()
 [![Nexpose](https://img.shields.io/badge/Nexpose-6.4.6%2B-green.svg)]()
 
 ## Installation
