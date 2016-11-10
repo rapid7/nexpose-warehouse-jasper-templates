@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-11-02T10:21:44 -->
+<!-- 2016-11-10T09:31:58 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="period-after" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
@@ -36,7 +36,7 @@
 		<parameterDescription><![CDATA[]]></parameterDescription>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT period_after('$P!{INPUT_PERIOD}') AS period]]>
+		<![CDATA[SELECT periodAfter('$P!{INPUT_PERIOD}') AS period]]>
 	</queryString>
 	<field name="period" class="java.lang.String"/>
 	<variable name="OUTPUT_PERIOD" class="java.time.LocalDate" calculation="First">
