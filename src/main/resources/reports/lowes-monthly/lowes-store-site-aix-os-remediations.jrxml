@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2016-12-06T22:11:23 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="lowes-store-site-aix-os-remediations" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="7" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
+	<property name="ireport.zoom" value="1.0514816984441795"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="112"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="322"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="671"/>
+	<style name="Title" fontSize="50" isBold="true"/>
+	<style name="SubTitle" forecolor="#736343" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontSize="12" isBold="true"/>
+	<style name="Detail" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="BASE_DIR" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["../.."]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LIMIT" class="java.lang.Integer">
+		<parameterDescription><![CDATA[The number of remediations to display.]]></parameterDescription>
+		<defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1;]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<variable name="CURRENT_PAGE_NUMBER" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="45">
+			<subreport>
+				<reportElement key="" x="0" y="0" width="523" height="45" uuid="d9386716-5aa8-43bd-b613-32328cc3dc89">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TITLE">
+					<subreportParameterExpression><![CDATA["Top 10 Remediations by Exploit"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUB_TITLE">
+					<subreportParameterExpression><![CDATA[]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA["Store IBM AIX OS"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_SITE">
+					<subreportParameterExpression><![CDATA["false"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET_GROUP">
+					<subreportParameterExpression><![CDATA["false"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_TAG">
+					<subreportParameterExpression><![CDATA["false"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA["false"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/_appendices/title.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<detail>
+		<band height="139">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="0" width="523" height="139" uuid="c9d6c351-6792-460c-a75b-c6c779fcac7a"/>
+				<subreportParameter name="BASE_DIR">
+					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_ASSET">
+					<subreportParameterExpression><![CDATA["asset_id IN (" +
+"	SELECT asset_id  " + 
+"	FROM dim_asset " + 
+"   WHERE sites ILIKE '%store%site%' AND os_vendor ILIKE '%IBM%' AND os_family ILIKE '%AIX%' " +
+")"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="WHERE_FILTER_VULNERABILITY">
+					<subreportParameterExpression><![CDATA["vulnerability_id IN ( " +
+"   SELECT DISTINCT vulnerability_id " +
+"   FROM dim_vulnerability_category " +
+"   WHERE category_name IN ('Amazon Linux AMI', 'Apple iOS', 'Apple Mac OS X', 'Canonical', 'CentOS', 'Check Point', 'Check Point Firewall', 'Cisco IOS', 'Cisco NX-OS', 'Cisco SANS-OS', 'Debian Linux', 'Fedora', 'Fedora Core Linux', 'FreeBSD', 'HP', 'IBM AIX', 'IBM AS/400', 'Juniper Junos OS', 'Juniper ScreenOS', 'Linux', 'Microsoft Windows', 'Microsoft Patch', 'NetWare', 'Obsolete OS', 'Oracle Linux', 'Oracle Solaris', 'Red Hat', 'Red Hat Enterprise Linux', 'SuSE', 'Ubuntu Linux', 'UNIX', 'VMware', 'VMware ESX/ESXi', 'VMware Fusion', 'VMware Player', 'VMware Workstation') " +
+") "+
+" AND vulnerability_id IN (SELECT vulnerability_id FROM dim_vulnerability WHERE severity = 'Critical' OR severity = 'Severe')"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ORDER_BY">
+					<subreportParameterExpression><![CDATA["exploits DESC"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LIMIT">
+					<subreportParameterExpression><![CDATA[$P{LIMIT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{BASE_DIR} + "/subreports/remediation/remediation-listing.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="23">
+			<textField evaluationTime="Auto">
+				<reportElement x="370" y="3" width="153" height="20" uuid="92493412-dec6-4b15-8549-180a6956878d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[msg("{0} of {1}", $V{CURRENT_PAGE_NUMBER}, $V{PAGE_NUMBER})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
