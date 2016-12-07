@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T10:51:04 -->
+<!-- 2016-12-07T15:16:52 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="remediation-listing" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
@@ -257,7 +257,7 @@ ORDER BY section DESC, row_number ASC]]>
 					</reportElement>
 					<box topPadding="3"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="14" isBold="true"/>
+						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Will Remediate"]]></textFieldExpression>
 				</textField>
@@ -265,8 +265,8 @@ ORDER BY section DESC, row_number ASC]]>
 					<reportElement x="0" y="19" width="135" height="27" forecolor="#FFFFFF" uuid="5b5a7220-d171-4b86-8be0-128d5fb7fd7d">
 						<property name="net.sf.jasperreports.export.html.id" value="resolvevulnerabilities"/>
 					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="22" isBold="true"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font size="18" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{TOTAL_VULNERABILITIES}.doubleValue() / $V{START_VULNERABILITIES}]]></textFieldExpression>
 					<patternExpression><![CDATA[(($V{TOTAL_VULNERABILITIES}.floatValue() / $V{START_VULNERABILITIES}) * 100) > 10.0 ? "##0%" : (($V{TOTAL_VULNERABILITIES}.floatValue() / $V{START_VULNERABILITIES}) * 100) > 1.0 ? "##0.0%" : 
@@ -274,8 +274,8 @@ ORDER BY section DESC, row_number ASC]]>
 				</textField>
 				<textField evaluationTime="Report" pattern="">
 					<reportElement x="0" y="46" width="135" height="14" forecolor="#F4BFAB" uuid="c91ef853-d00b-4046-a7f9-b93701292840"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="10"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Vulnerabilities"]]></textFieldExpression>
 				</textField>
@@ -284,8 +284,8 @@ ORDER BY section DESC, row_number ASC]]>
 						<property name="net.sf.jasperreports.export.html.id" value="resolvevulnerabilities"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
-						<font size="22" isBold="true"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" rotation="None">
+						<font size="18" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{TOTAL_RISK_SCORE}.doubleValue() / $V{START_RISK_SCORE}]]></textFieldExpression>
 					<patternExpression><![CDATA[(($V{TOTAL_RISK_SCORE}.floatValue() / $V{TOTAL_RISK_SCORE}) * 100) > 10.0 ? "##0%" : (($V{TOTAL_RISK_SCORE}.floatValue() / $V{TOTAL_RISK_SCORE}) * 100) > 1.0 ? "##0.0%" : 
@@ -293,8 +293,8 @@ ORDER BY section DESC, row_number ASC]]>
 				</textField>
 				<textField evaluationTime="Report" pattern="">
 					<reportElement x="140" y="46" width="135" height="14" forecolor="#F4BFAB" uuid="78145bf9-8091-4034-89c3-7fb0a921b868"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="10"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Risk"]]></textFieldExpression>
 				</textField>
