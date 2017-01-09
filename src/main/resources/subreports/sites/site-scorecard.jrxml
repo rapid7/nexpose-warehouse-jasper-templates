@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T15:35:26 -->
+<!-- 2016-12-13T18:40:49 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="site-scorecard" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.0514816984441795"/>
 	<property name="ireport.x" value="0"/>
@@ -612,7 +612,7 @@ $F{assessed}.doubleValue() / $F{assets} <  .10 ? "(##.0%)" : "(##%)"]]></pattern
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="WHERE_FILTER">
+				<subreportParameter name="WHERE_FILTER_ASSET">
 					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="LIMIT">
@@ -635,7 +635,7 @@ $F{assessed}.doubleValue() / $F{assets} <  .10 ? "(##.0%)" : "(##%)"]]></pattern
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="WHERE_FILTER">
+				<subreportParameter name="WHERE_FILTER_ASSET">
 					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="LIMIT">
@@ -658,7 +658,7 @@ $F{assessed}.doubleValue() / $F{assets} <  .10 ? "(##.0%)" : "(##%)"]]></pattern
 				<subreportParameter name="BASE_DIR">
 					<subreportParameterExpression><![CDATA[$P{BASE_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="WHERE_FILTER">
+				<subreportParameter name="WHERE_FILTER_ASSET">
 					<subreportParameterExpression><![CDATA["asset_id IN (SELECT asset_id FROM dim_site_asset WHERE site_id = " + $F{site_id} + ")"]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="LIMIT">

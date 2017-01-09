@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-11-02T20:21:09 -->
+<!-- 2016-12-13T18:43:27 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="asset-listing" pageWidth="523" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="523" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a786fdfe-ffc6-438b-b7f5-989b07c781b2">
 	<property name="ireport.zoom" value="1.1269722013523715"/>
 	<property name="ireport.x" value="0"/>
@@ -51,7 +51,7 @@
 		<defaultValueExpression><![CDATA[Integer.MAX_VALUE]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT asset_id, COALESCE(host_name, HOST(ip_address)) AS name,
+		<![CDATA[SELECT asset_id, COALESCE(COALESCE(host_name, HOST(ip_address)), 'Unknown') AS name,
    risk_score, vulnerabilities, malware_kits, exploits, critical_vulnerabilities,
    severe_vulnerabilities, moderate_vulnerabilities, vulnerabilities_with_malware_kit,
    vulnerabilities_with_exploit

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2016-10-31T15:24:33 -->
+<!-- 2016-12-13T18:48:36 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="most-common-services-listing" pageWidth="144" pageHeight="200" columnWidth="144" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5969dff1-afee-44d4-96f3-3599083d86b7">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="warehouse"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
@@ -101,7 +101,7 @@ LIMIT $P!{LIMIT}]]>
 				</reportElement>
 				<box leftPadding="0" rightPadding="1"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new DecimalFormat("(##.0%)").format($F{assets} / $F{total_assets}.doubleValue())]]></textFieldExpression>
 			</textField>
