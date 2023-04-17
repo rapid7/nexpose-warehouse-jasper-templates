@@ -14,7 +14,7 @@ Nexpose Warehouse Jasper Templates is a set of report templates designed for use
 This project contains [self-contained directory](src/main/resources) of templates, sub-reports, and resources. To configure a [Jaspersoft® Studio](http://community.jaspersoft.com/project/jaspersoft-studio) workspace to edit and execute these templates, follow these steps:
 
 1. Clone this repository (e.g. `git clone git@github.com:rapid7/nexpose-warehouse-jasper-templates.git`)
-2. [Download](http://community.jaspersoft.com/project/jaspersoft-studio/releases) andi nstall the latest version of [TIBCO Jaspersoft® Studio](http://community.jaspersoft.com/project/jaspersoft-studio)
+2. [Download](http://community.jaspersoft.com/project/jaspersoft-studio/releases) and install the latest version of [TIBCO Jaspersoft® Studio](http://community.jaspersoft.com/project/jaspersoft-studio)
 2. Open Jaspersoft® Studio
 3. Create a new or select an existing workspace
 4. Create a project in your workspace
