@@ -1,0 +1,15 @@
+---
+info:
+  title: Nexpose Warehouse Jasper Templates
+  description: Jaspersoft Studio report templates for Nexpose Data Warehouse
+  x-cortex-git:
+    github:
+      alias: r7org
+      repository: rapid7/nexpose-warehouse-jasper-templates
+  x-cortex-tag: nexpose-warehouse-jasper-templates
+  x-cortex-type: service
+  x-cortex-domain-parents:
+  - tag: vm-console
+openapi: 3.0.1
+servers:
+- url: "/"
