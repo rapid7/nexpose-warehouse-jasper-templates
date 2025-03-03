@@ -9,7 +9,7 @@ info:
   x-cortex-tag: nexpose-warehouse-jasper-templates
   x-cortex-type: service
   x-cortex-domain-parents:
-  - tag: insightvm
+  - tag: vm-console
   x-cortex-groups:
    - target:not-deployed
    - strategy:on-prem
